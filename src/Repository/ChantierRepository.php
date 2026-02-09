@@ -16,6 +16,48 @@ class ChantierRepository extends ServiceEntityRepository
         parent::__construct($registry, Chantier::class);
     }
 
+    public function findChantiersDashboard(): array
+    {
+        $today = new \DateTime();
+
+        // chantiers démarrés
+        $demarres = $this->createQueryBuilder('c')
+            ->where('c.dateDemarrage IS NOT NULL')
+            ->andWhere('c.dateDemarrage <= :today')
+            ->andWhere('c.dateReception IS NULL')
+            ->setParameter('today', $today->format('Y-m-d'))
+            ->orderBy('c.dateDemarrage', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+
+        // À venir
+        $aVenir = $this->createQueryBuilder('c')
+            ->where('c.dateDebutPrevue > :today')
+            ->andWhere('c.dateDemarrage IS NULL')
+            ->setParameter('today', $today->format('Y-m-d'))
+            ->orderBy('c.dateDebutPrevue', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+       // Terminés : dateReception <= today
+        $termines = $this->createQueryBuilder('c')
+            ->where('c.dateReception IS NOT NULL')
+            ->andWhere('c.dateReception <= :today')
+            ->setParameter('today', $today->format('Y-m-d'))
+            ->orderBy('c.dateReception', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return [
+            'demarres' => $demarres,
+            'aVenir' => $aVenir,
+            'termines' => $termines,
+        ];
+    }
+
+
+
     //    /**
     //     * @return Chantier[] Returns an array of Chantier objects
     //     */

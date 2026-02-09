@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ClientRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
@@ -24,6 +26,17 @@ class Client
 
     #[ORM\Column(length: 120, nullable: true)]
     private ?string $mail = null;
+
+    /**
+     * @var Collection<int, Chantier>
+     */
+    #[ORM\OneToMany(targetEntity: Chantier::class, mappedBy: 'client')]
+    private Collection $chantiers;
+
+    public function __construct()
+    {
+        $this->chantiers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -74,6 +87,36 @@ class Client
     public function setMail(?string $mail): static
     {
         $this->mail = $mail;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Chantier>
+     */
+    public function getChantiers(): Collection
+    {
+        return $this->chantiers;
+    }
+
+    public function addChantier(Chantier $chantier): static
+    {
+        if (!$this->chantiers->contains($chantier)) {
+            $this->chantiers->add($chantier);
+            $chantier->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChantier(Chantier $chantier): static
+    {
+        if ($this->chantiers->removeElement($chantier)) {
+            // set the owning side to null (unless already changed)
+            if ($chantier->getClient() === $this) {
+                $chantier->setClient(null);
+            }
+        }
 
         return $this;
     }

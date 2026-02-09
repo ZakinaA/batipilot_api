@@ -75,6 +75,9 @@ class Chantier
     #[ORM\OneToMany(targetEntity: ChantierEtape::class, mappedBy: 'chantier')]
     private Collection $chantierEtapes;
 
+    #[ORM\ManyToOne(inversedBy: 'chantiers')]
+    private ?Client $client = null;
+
     public function __construct()
     {
         $this->chantierPostes = new ArrayCollection();
@@ -322,6 +325,18 @@ class Chantier
                 $chantierEtape->setChantier(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): static
+    {
+        $this->client = $client;
 
         return $this;
     }

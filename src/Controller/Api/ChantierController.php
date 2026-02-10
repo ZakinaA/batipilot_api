@@ -54,8 +54,8 @@ class ChantierController extends AbstractController
 
         return $this->json($data);
     }
-    /*
-    #[Route('/{id}/detail', name: 'chantier_detail', methods: ['GET'])]
+    
+    #[Route('/show/{id}', name: 'chantier_show', methods: ['GET'])]
     public function detail(int $id): JsonResponse
     {
         $chantier = $this->repository->find($id);
@@ -108,5 +108,5 @@ class ChantierController extends AbstractController
         }
 
         return $this->json($dto);
-    }*/
+    }
 }

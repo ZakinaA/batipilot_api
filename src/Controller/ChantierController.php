@@ -1,5 +1,4 @@
 <?php
-// src/Controller/DashboardController.php
 namespace App\Controller;
 
 use App\Repository\ChantierRepository;
@@ -7,10 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-class AccueilController extends AbstractController
+class ChantierController extends AbstractController
 {
-    #[Route('/api/accueil', name: 'accueil', methods: ['GET'])]
-    public function dashboard(ChantierRepository $chantierRepo): JsonResponse
+    #[Route('/chantiers/type', name: 'chantiers_type', methods: ['GET'])]
+    public function list(ChantierRepository $chantierRepo): JsonResponse
     {
         $result = $chantierRepo->findChantiersDashboard();
 

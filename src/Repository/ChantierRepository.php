@@ -16,7 +16,7 @@ class ChantierRepository extends ServiceEntityRepository
         parent::__construct($registry, Chantier::class);
     }
 
-    public function findChantiersDashboard(): array
+    public function findChantiersParEtat(): array
     {
         $today = new \DateTime();
 

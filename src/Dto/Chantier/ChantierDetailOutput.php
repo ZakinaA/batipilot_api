@@ -10,6 +10,7 @@ class ChantierDetailOutput
     public ?\DateTime $dateDebutPrevue = null;
     public ?\DateTime $dateDemarrage = null;
     public ?\DateTime $dateFin = null;
+    public ?string $equipe = null;
     public ?ClientDetailOutput $client = null;
     /** @var ChantierPosteOutput[] */
     public array $postes = [];

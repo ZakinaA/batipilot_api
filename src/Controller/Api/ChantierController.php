@@ -71,6 +71,11 @@ class ChantierController extends AbstractController
         $dto->dateDemarrage = $chantier->getDateDemarrage();
         $dto->dateFin = $chantier->getDateFin();
 
+        // Équipe : juste le nom
+        if ($chantier->getEquipe()) {
+            $dto->equipe = $chantier->getEquipe()->getNom();
+        }
+
         if ($chantier->getClient()) {
             $clientDto = new ClientDetailOutput();
             //$clientDto->id = $chantier->getClient()->getId();
@@ -80,6 +85,8 @@ class ChantierController extends AbstractController
             $clientDto->prenom = $chantier->getClient()->getMail();
             $dto->client = $clientDto;
         }
+
+       
 
         foreach ($chantier->getChantierPostes() as $cp) {
             $posteDto = new ChantierPosteOutput();

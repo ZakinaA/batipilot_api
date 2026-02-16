@@ -1,7 +1,7 @@
 <?php
 namespace App\Dto\Chantier;
 
-class ChantierEtapesOutput
+class ChantierEtapeOutput
 {
     public int $id;
     public string $libelle;

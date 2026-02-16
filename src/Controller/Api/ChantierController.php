@@ -90,7 +90,7 @@ class ChantierController extends AbstractController
             $posteDto->montantFournitures = $cp->getMontantFournitures();
             $posteDto->nbJoursTravailles = $cp->getNbJoursTravailles();
 
-            foreach ($cp->getPoste()->getEtapes() as $etape) {
+            /*foreach ($cp->getPoste()->getEtapes() as $etape) {
                 $chantierEtape = $etape->getChantierEtapes()->filter(fn($ce) => $ce->getChantier()->getId() === $chantier->getId())->first();
                 if ($chantierEtape) {
                     $etapeDto = new EtapeOutput();
@@ -103,9 +103,9 @@ class ChantierController extends AbstractController
                     $etapeDto->valDate = $chantierEtape->getValDate();
                     $etapeDto->valDateHeure = $chantierEtape->getValDateHeure();
 
-                    $posteDto->etapes[] = $etapeDto;
+                    //$posteDto->etapes[] = $etapeDto;
                 }
-            }
+            }*/
 
             $dto->postes[] = $posteDto;
         }

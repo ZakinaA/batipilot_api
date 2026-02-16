@@ -96,6 +96,8 @@ class ChantierController extends AbstractController
             $posteDto->montantTTC = $cp->getMontantTTC();
             $posteDto->montantFournitures = $cp->getMontantFournitures();
             $posteDto->nbJoursTravailles = $cp->getNbJoursTravailles();
+            $posteDto->montantPrestataire = $cp->getMontantPrestataire();
+
 
             /*foreach ($cp->getPoste()->getEtapes() as $etape) {
                 $chantierEtape = $etape->getChantierEtapes()->filter(fn($ce) => $ce->getChantier()->getId() === $chantier->getId())->first();

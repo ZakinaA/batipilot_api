@@ -9,6 +9,7 @@ class ChantierPosteOutput
     public ?float $montantTTC = null;
     public ?float $montantFournitures = null;
     public ?float $nbJoursTravailles = null;
+    public ?float $montantPrestataire = null;
 
     /** @var EtapeOutput[] */
     public array $etapes = [];

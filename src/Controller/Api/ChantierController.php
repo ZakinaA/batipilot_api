@@ -80,18 +80,29 @@ class ChantierController extends AbstractController
         $dto->coefficient = $chantier->getCoefficient();
         $dto->alerte = $chantier->getAlerte();
 
+        // variables de calcul
+        $dto->totalVenduHT = 0 ;
+        $dto->totalVenduTTC = 0;
+
+        $dto->totalFournitures = 0;
+        $dto->totalMainOeuvre = 0;
+        $dto->totalPrestataire = 0;
+        $dto->marge = 0;
+       
+
         // Équipe : juste le nom
         if ($chantier->getEquipe()) {
             $dto->equipe = $chantier->getEquipe()->getNom();
         }
 
+        // Infos Client
         if ($chantier->getClient()) {
             $clientDto = new ClientDetailOutput();
             //$clientDto->id = $chantier->getClient()->getId();
             $clientDto->nom = $chantier->getClient()->getNom();
             $clientDto->prenom = $chantier->getClient()->getPrenom();
-            $clientDto->prenom = $chantier->getClient()->getTelephone();
-            $clientDto->prenom = $chantier->getClient()->getMail();
+            $clientDto->telephone = $chantier->getClient()->getTelephone();
+            $clientDto->mail = $chantier->getClient()->getMail();
             $dto->client = $clientDto;
         }
 
@@ -106,7 +117,15 @@ class ChantierController extends AbstractController
             $posteDto->montantFournitures = $cp->getMontantFournitures();
             $posteDto->nbJoursTravailles = $cp->getNbJoursTravailles();
             $posteDto->montantPrestataire = $cp->getMontantPrestataire();
+            $posteDto->coutMainOeuvre = round( ($cp->getNbJoursTravailles() * $chantier->getCoefficient()), 2);
 
+            // calculs : cumuls pour chaque poste
+            $dto->totalVenduHT = round($dto->totalVenduHT + $cp->getMontantHT(), 2) ;
+            $dto->totalVenduTTC = round($dto->totalVenduTTC + $cp->getMontantTTC(), 2) ;
+
+            $dto->totalFournitures = round($dto->totalFournitures + $cp->getMontantFournitures(), 2); 
+            $dto->totalMainOeuvre = round($dto->totalMainOeuvre + $posteDto->coutMainOeuvre, 2);
+            $dto->totalPrestataire = round($dto->totalPrestataire + $cp->getMontantPrestataire(), 2);
 
             /*foreach ($cp->getPoste()->getEtapes() as $etape) {
                 $chantierEtape = $etape->getChantierEtapes()->filter(fn($ce) => $ce->getChantier()->getId() === $chantier->getId())->first();
@@ -128,6 +147,10 @@ class ChantierController extends AbstractController
             $dto->postes[] = $posteDto;
         }
 
+        //calcul de la marge
+        $dto->marge = round((($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire)/ $dto->totalVenduHT)*100,2);
+
+        
         return $this->json($dto);
     }
 }

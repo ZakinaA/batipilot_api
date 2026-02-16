@@ -21,7 +21,16 @@ class ChantierDetailOutput
     public ?string $alerte = null;
     public ?string $equipe = null;
     public ?ClientDetailOutput $client = null;
-    
+
+    // variables de calcul
+    public ?float $totalVenduHT = null;
+    public ?float $totalVenduTTC = null;
+
+    public ?float $totalFournitures = null;
+    public ?float $totalMainOeuvre = null;
+    public ?float $totalPrestataire = null;
+    public ?float $marge = null;
+
     /** @var ChantierPosteOutput[] */
     public array $postes = [];
 }

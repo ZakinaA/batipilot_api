@@ -87,6 +87,7 @@ class ChantierController extends AbstractController
         $dto->totalFournitures = 0;
         $dto->totalMainOeuvre = 0;
         $dto->totalPrestataire = 0;
+        $dto->cout = 0;
         $dto->marge = 0;
        
 
@@ -126,7 +127,7 @@ class ChantierController extends AbstractController
             $dto->totalFournitures = round($dto->totalFournitures + $cp->getMontantFournitures(), 2); 
             $dto->totalMainOeuvre = round($dto->totalMainOeuvre + $posteDto->coutMainOeuvre, 2);
             $dto->totalPrestataire = round($dto->totalPrestataire + $cp->getMontantPrestataire(), 2);
-
+            
             /*foreach ($cp->getPoste()->getEtapes() as $etape) {
                 $chantierEtape = $etape->getChantierEtapes()->filter(fn($ce) => $ce->getChantier()->getId() === $chantier->getId())->first();
                 if ($chantierEtape) {
@@ -147,8 +148,11 @@ class ChantierController extends AbstractController
             $dto->postes[] = $posteDto;
         }
 
+        // calcul du cout total chantier
+        $dto->totalCout = round($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire, 2);
+
         //calcul de la marge
-        $dto->marge = round((($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire)/ $dto->totalVenduHT)*100,2);
+        $dto->marge = round((($dto->totalVenduHT - $dto->totalCout) / $dto->totalCout)*100,2);
 
         
         return $this->json($dto);

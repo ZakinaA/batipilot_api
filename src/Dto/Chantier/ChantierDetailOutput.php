@@ -29,6 +29,7 @@ class ChantierDetailOutput
     public ?float $totalFournitures = null;
     public ?float $totalMainOeuvre = null;
     public ?float $totalPrestataire = null;
+    public ?float $totalCout = null;
     public ?float $marge = null;
 
     /** @var ChantierPosteOutput[] */

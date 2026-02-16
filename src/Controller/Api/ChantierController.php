@@ -67,9 +67,18 @@ class ChantierController extends AbstractController
         $dto = new ChantierDetailOutput();
         $dto->id = $chantier->getId();
         $dto->adresse = $chantier->getAdresse();
+        $dto->copos = $chantier->getCopos();
+        $dto->ville = $chantier->getVille();
         $dto->dateDebutPrevue = $chantier->getDateDebutPrevue();
         $dto->dateDemarrage = $chantier->getDateDemarrage();
+        $dto->dateReception = $chantier->getDateReception();
         $dto->dateFin = $chantier->getDateFin();
+        $dto->surfacePlancher = $chantier->getSurfacePlancher();
+        $dto->surfaceHabitable = $chantier->getSurfaceHabitable();
+        $dto->distanceDepot = $chantier->getDistanceDepot();
+        $dto->tempsTrajet = $chantier->getTempsTrajet();
+        $dto->coefficient = $chantier->getCoefficient();
+        $dto->alerte = $chantier->getAlerte();
 
         // Équipe : juste le nom
         if ($chantier->getEquipe()) {

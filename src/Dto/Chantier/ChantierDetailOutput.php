@@ -1,6 +1,8 @@
 <?php
 namespace App\Dto\Chantier;
 
+use App\Dto\Client\ClientDetailOutput;
+
 class ChantierDetailOutput
 {
     public int $id;
@@ -8,7 +10,7 @@ class ChantierDetailOutput
     public ?\DateTime $dateDebutPrevue = null;
     public ?\DateTime $dateDemarrage = null;
     public ?\DateTime $dateFin = null;
-    public ?ClientOutput $client = null;
+    public ?ClientDetailOutput $client = null;
     /** @var ChantierPosteOutput[] */
     public array $postes = [];
 }

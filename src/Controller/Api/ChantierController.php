@@ -6,9 +6,9 @@ use App\Repository\ChantierRepository;
 use App\Dto\Chantier\ChantierListOutput;
 use App\Dto\Chantier\ChantierMiniOutput;
 use App\Dto\Chantier\ChantierDetailOutput;
-use App\Dto\Client\ClientOutput;
-use App\Dto\Chantier\ChantierPostesOutput;
-use App\Dto\Chantier\ChantierEtapesOutput;
+use App\Dto\Client\ClientDetailOutput;
+use App\Dto\Chantier\ChantierPosteOutput;
+use App\Dto\Chantier\ChantierEtapeOutput;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,7 +36,8 @@ class ChantierController extends AbstractController
 
         foreach ($result['aVenir'] as $c) {
             $mini = new ChantierMiniOutput();
-            $mini->id = $c->getId();
+            //$mini->id = $c->getId();
+            $mini->adresse = $c->getAdresse();
             $mini->adresse = $c->getAdresse();
             $mini->dateDemarrage = $c->getDateDemarrage();
             $mini->dateFin = $c->getDateFin();
@@ -71,10 +72,12 @@ class ChantierController extends AbstractController
         $dto->dateFin = $chantier->getDateFin();
 
         if ($chantier->getClient()) {
-            $clientDto = new ClientOutput();
-            $clientDto->id = $chantier->getClient()->getId();
+            $clientDto = new ClientDetailOutput();
+            //$clientDto->id = $chantier->getClient()->getId();
             $clientDto->nom = $chantier->getClient()->getNom();
             $clientDto->prenom = $chantier->getClient()->getPrenom();
+            $clientDto->prenom = $chantier->getClient()->getTelephone();
+            $clientDto->prenom = $chantier->getClient()->getMail();
             $dto->client = $clientDto;
         }
 

@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Repository\ChantierRepository;
-use App\Dto\Chantier\ChantierListOutput;
 use App\Dto\Chantier\ChantierMiniOutput;
 use App\Dto\Chantier\ChantierDetailOutput;
 use App\Dto\Client\ClientDetailOutput;
@@ -14,6 +13,7 @@ class ChantierService
     public function __construct(
         private ChantierRepository $chantierRepository
     ) {}
+
 
     /**
      * Liste les chantiers démarrés, à venir, terminés
@@ -49,10 +49,7 @@ class ChantierService
         usort($result['termines'], fn($a, $b) => $b->dateReception <=> $a->dateReception);
         usort($result['demarres'], fn($a, $b) => $a->dateDemarrage <=> $b->dateDemarrage);
         usort($result['aVenir'], fn($a, $b) => $a->dateDebutPrevue <=> $b->dateDebutPrevue);
-        
-
-        return $result;
-      
+        return $result;     
     }
 
     /**

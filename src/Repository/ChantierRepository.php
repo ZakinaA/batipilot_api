@@ -15,7 +15,7 @@ class ChantierRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Chantier::class);
     }
-
+    /*  Ne sert plus - refactoring dans ChantierService: list
     public function findChantiersParEtat(): array
     {
         $today = new \DateTime();
@@ -54,7 +54,7 @@ class ChantierRepository extends ServiceEntityRepository
             'aVenir' => $aVenir,
             'termines' => $termines,
         ];
-    }
+    }*/
 
 
 

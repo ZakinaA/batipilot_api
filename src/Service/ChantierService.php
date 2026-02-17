@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Repository\ChantierRepository;
 use App\Dto\Chantier\ChantierMiniOutput;
+use App\Dto\Client\ChantierClientOutput;
+use App\Dto\Chantier\ChantierPosteOutput;
 use App\Dto\Chantier\ChantierDetailOutput;
 use App\Dto\Client\ClientDetailOutput;
 use App\Entity\Chantier;
@@ -55,15 +57,100 @@ class ChantierService
     /**
      * Retourne le détail d’un chantier
      */
-    public function getDetail(int $id): ChantierDetailOutput
+    public function show($chantier): ChantierDetailOutput
     {
-        $chantier = $this->chantierRepository->find($id);
 
-        if (!$chantier) {
-            throw new \RuntimeException('Chantier introuvable');
+        $dto = new ChantierDetailOutput();
+        $dto->id = $chantier->getId();
+        $dto->adresse = $chantier->getAdresse();
+        $dto->copos = $chantier->getCopos();
+        $dto->ville = $chantier->getVille();
+        $dto->dateDebutPrevue = $chantier->getDateDebutPrevue();
+        $dto->dateDemarrage = $chantier->getDateDemarrage();
+        $dto->dateReception = $chantier->getDateReception();
+        $dto->dateFin = $chantier->getDateFin();
+        $dto->surfacePlancher = $chantier->getSurfacePlancher();
+        $dto->surfaceHabitable = $chantier->getSurfaceHabitable();
+        $dto->distanceDepot = $chantier->getDistanceDepot();
+        $dto->tempsTrajet = $chantier->getTempsTrajet();
+        $dto->coefficient = $chantier->getCoefficient();
+        $dto->alerte = $chantier->getAlerte();
+
+        // variables de calcul
+        $dto->totalVenduHT = 0 ;
+        $dto->totalVenduTTC = 0;
+
+        $dto->totalFournitures = 0;
+        $dto->totalMainOeuvre = 0;
+        $dto->totalPrestataire = 0;
+        $dto->cout = 0;
+        $dto->marge = 0;
+       
+
+        // Équipe : juste le nom
+        if ($chantier->getEquipe()) {
+            $dto->equipe = $chantier->getEquipe()->getNom();
         }
 
-        return $this->mapToDetailOutput($chantier);
+        // Infos Client
+        if ($chantier->getClient()) {
+            $clientDto = new ClientDetailOutput();
+            //$clientDto->id = $chantier->getClient()->getId();
+            $clientDto->nom = $chantier->getClient()->getNom();
+            $clientDto->prenom = $chantier->getClient()->getPrenom();
+            $clientDto->telephone = $chantier->getClient()->getTelephone();
+            $clientDto->mail = $chantier->getClient()->getMail();
+            $dto->client = $clientDto;
+        }
+
+       
+
+        foreach ($chantier->getChantierPostes() as $cp) {
+            $posteDto = new ChantierPosteOutput();
+            $posteDto->id = $cp->getId();
+            $posteDto->libelle = $cp->getPoste()->getLibelle();
+            $posteDto->montantHT = $cp->getMontantHT();
+            $posteDto->montantTTC = $cp->getMontantTTC();
+            $posteDto->montantFournitures = $cp->getMontantFournitures();
+            $posteDto->nbJoursTravailles = $cp->getNbJoursTravailles();
+            $posteDto->montantPrestataire = $cp->getMontantPrestataire();
+            $posteDto->coutMainOeuvre = round( ($cp->getNbJoursTravailles() * $chantier->getCoefficient()), 2);
+
+            // calculs : cumuls pour chaque poste
+            $dto->totalVenduHT = round($dto->totalVenduHT + $cp->getMontantHT(), 2) ;
+            $dto->totalVenduTTC = round($dto->totalVenduTTC + $cp->getMontantTTC(), 2) ;
+
+            $dto->totalFournitures = round($dto->totalFournitures + $cp->getMontantFournitures(), 2); 
+            $dto->totalMainOeuvre = round($dto->totalMainOeuvre + $posteDto->coutMainOeuvre, 2);
+            $dto->totalPrestataire = round($dto->totalPrestataire + $cp->getMontantPrestataire(), 2);
+            
+            /*foreach ($cp->getPoste()->getEtapes() as $etape) {
+                $chantierEtape = $etape->getChantierEtapes()->filter(fn($ce) => $ce->getChantier()->getId() === $chantier->getId())->first();
+                if ($chantierEtape) {
+                    $etapeDto = new EtapeOutput();
+                    $etapeDto->id = $etape->getId();
+                    $etapeDto->libelle = $etape->getLibelle();
+                    $etapeDto->valBoolean = $chantierEtape->isValBoolean();
+                    $etapeDto->valInteger = $chantierEtape->getValInteger();
+                    $etapeDto->valFloat = $chantierEtape->getValFloat();
+                    $etapeDto->valText = $chantierEtape->getValText();
+                    $etapeDto->valDate = $chantierEtape->getValDate();
+                    $etapeDto->valDateHeure = $chantierEtape->getValDateHeure();
+
+                    //$posteDto->etapes[] = $etapeDto;
+                }
+            }*/
+
+            $dto->postes[] = $posteDto;
+        }
+
+        // calcul du cout total chantier
+        $dto->totalCout = round($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire, 2);
+
+        //calcul de la marge
+        $dto->marge = round((($dto->totalVenduHT - $dto->totalCout) / $dto->totalCout)*100,2);
+    
+        return $dto ;
     }
 
 
@@ -95,9 +182,6 @@ class ChantierService
 
     }
 
-
-
-
     /**
      * Mapping  pour la liste des démarrés, à venir, archivés
      */
@@ -115,45 +199,6 @@ class ChantierService
 
         return $mini;    
 
-    }
-
-    /**
-     * Mapping vers ton DTO existant
-     */
-    private function mapToDetailOutput(Chantier $chantier): ChantierDetailOutput
-    {
-        $output = new ChantierDetailOutput();
-
-        $output->id = $chantier->getId();
-        $output->adresse = $chantier->getAdresse();
-        $output->copos = $chantier->getCopos();
-        $output->ville = $chantier->getVille();
-        $output->dateDebutPrevue = $chantier->getDateDebutPrevue()?->format('Y-m-d');
-        $output->surfacePlancher = $chantier->getSurfacePlancher();
-        $output->surfaceHabitable = $chantier->getSurfaceHabitable();
-        $output->distanceDepot = $chantier->getDistanceDepot();
-        $output->tempsTrajet = $chantier->getTempsTrajet();
-        $output->coefficient = $chantier->getCoefficient();
-        $output->alerte = $chantier->isAlerte();
-
-        $output->postes = [];
-
-        foreach ($chantier->getChantierPostes() as $chantierPoste) {
-
-            $posteOutput = new ChantierPosteOutput();
-
-            $posteOutput->posteId = $chantierPoste->getPoste()->getId();
-            $posteOutput->posteNom = $chantierPoste->getPoste()->getNom();
-            $posteOutput->montantHT = $chantierPoste->getMontantHT();
-            $posteOutput->montantTTC = $chantierPoste->getMontantTTC();
-            $posteOutput->montantFournitures = $chantierPoste->getMontantFournitures();
-            $posteOutput->nbJoursTravailles = $chantierPoste->getNbJoursTravailles();
-            $posteOutput->montantPrestataire = $chantierPoste->getMontantPrestataire();
-
-            $output->postes[] = $posteOutput;
-        }
-
-        return $output;
     }
 
 }

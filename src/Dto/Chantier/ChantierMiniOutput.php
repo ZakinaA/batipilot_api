@@ -4,7 +4,11 @@ namespace App\Dto\Chantier;
 class ChantierMiniOutput
 {
     public int $id;
-    public ?string $adresse = null;
-    public ?\DateTime $dateDemarrage = null;
-    public ?\DateTime $dateFin = null;
+    public ?string $nomClient = null;
+    public ?string $ville = null;
+    public ?\DateTimeInterface $dateDebutPrevue = null;
+    public ?\DateTimeInterface $dateDemarrage = null;
+    public ?\DateTimeInterface $dateReception = null;
+    public ?\DateTimeInterface $dateFin = null;
+    
 }

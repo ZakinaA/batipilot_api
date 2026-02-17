@@ -12,6 +12,7 @@ use App\Dto\Chantier\ChantierEtapeOutput;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\ChantierService;
 
 #[Route('/api2/chantiers')]
 class ChantierController extends AbstractController
@@ -19,9 +20,13 @@ class ChantierController extends AbstractController
     public function __construct(private ChantierRepository $repository) {}
 
     #[Route('/list', name: 'chantiers_list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(ChantierService $chantierService): JsonResponse
     {
-        $data = new ChantierListOutput();
+
+     return $this->json(
+        $chantierService->list()
+    );
+        /*$data = new ChantierListOutput();
 
         $result = $this->repository->findChantiersParEtat();
 
@@ -54,6 +59,7 @@ class ChantierController extends AbstractController
         }
 
         return $this->json($data);
+        */
     }
     
     #[Route('/show/{id}', name: 'chantier_show', methods: ['GET'])]

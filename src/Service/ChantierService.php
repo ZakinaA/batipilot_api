@@ -199,7 +199,7 @@ class ChantierService
     {
         $today = new \DateTimeImmutable('today');
 
-        if ($chantier->getDateReception() !== null && $chantier->getDateReception() > $today ) {
+        if ($chantier->getDateReception() !== null && $chantier->getDateReception() < $today ) {
             return 'termine';
         }
 

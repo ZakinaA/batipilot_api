@@ -78,7 +78,8 @@ class ChantierService
     private function getEtatChantier(Chantier $chantier): string
     {
         $today = new \DateTimeImmutable('today');
-        if ($chantier->getDateReception() !== null || $chantier->getDateReception() > $today ) {
+
+        if ($chantier->getDateReception() !== null && $chantier->getDateReception() > $today ) {
             return 'termine';
         }
 
@@ -86,7 +87,7 @@ class ChantierService
             return 'demarre';
         }
         if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() > $today ) {
-            return 'demarre';
+            return 'a_venir';
         }
         return 'a_venir';
     }
@@ -94,7 +95,7 @@ class ChantierService
     /**
      * Retourne les informations générales du chantier + totalHT
      */
-    public function showOverview($chantier): ChantierOverviewOutput
+    public function showOverview(Chantier $chantier): ChantierOverviewOutput
     {
 
         $dto = new ChantierOverviewOutput();
@@ -138,7 +139,7 @@ class ChantierService
     /**
      * Retourne les informations financières du chantier
      */
-    public function showKpi($chantier): ChantierKpiOutput
+    public function showKpi(Chantier $chantier): ChantierKpiOutput
     {
  
         $dto = new ChantierKpiOutput();
@@ -187,9 +188,7 @@ class ChantierService
             $dto->totalMainOeuvre = round($dto->totalMainOeuvre + $posteDto->montantMainOeuvre, 2);
             $dto->totalPrestataire = round($dto->totalPrestataire + $cp->getMontantPrestataire(), 2);
             $dto->totalNbTrajets = $dto->totalNbTrajets + $posteDto->nbTrajets ;
-
-
-            
+                  
             /*foreach ($cp->getPoste()->getEtapes() as $etape) {
                 $chantierEtape = $etape->getChantierEtapes()->filter(fn($ce) => $ce->getChantier()->getId() === $chantier->getId())->first();
                 if ($chantierEtape) {
@@ -212,7 +211,7 @@ class ChantierService
         // fin de la boucle sur les postes
 
         // calcul du cout total chantier
-        $dto->totalTransport = round(($dto->totalNbTrajets*$chantier->getTempsTrajet())* $chantier->getCoefficient()/ 420 ,2);
+        $dto->totalTransport = $this->calculCoutTrajet($dto->totalNbTrajets, $chantier->getTempsTrajet(), $chantier->getCoefficient());
         $dto->totalMainOeuvreSansTransport = round($dto->totalMainOeuvre - $dto->totalTransport,2) ;
 
         $dto->totalCout = round($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire, 2);
@@ -223,15 +222,16 @@ class ChantierService
         return $dto ;
     }
 
-
-     /**
-     * 
-     */
-    private function getCoutTrajet(Chantier $chantier): float
+    // 1 journée = 7h = 420 min
+    // coutTrajetChantier = nbTrajets * 420/ coefficient
+    private function calculCoutTrajet(int $nbTrajets, float $tempsTrajet, float $coeff): float
     {
-        //1 journée = 7h = 420 min
-        // 420min = coefficient
-        // coutTrajetChantier = nbTrajets * 420/ coefficient
+        if ($nbTrajets <= 0 || $tempsTrajet <= 0 || $coeff <= 0) {
+            return 0.0;
+        }
+        $coutParMinute = $coeff / 420;
+        return round($nbTrajets * $tempsTrajet * $coutParMinute,2);
     }
+   
 
 }

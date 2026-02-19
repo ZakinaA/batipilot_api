@@ -119,13 +119,13 @@ class ChantierService
             //$posteDto->tauxMargePoste = round( (($posteDto->montantHT - $posteDto->montantCoutPoste) / $posteDto->montantCoutPoste *100),2);
             $posteDto->tauxMargePoste = $this->safePercent($posteDto->margePoste,$posteDto->montantCoutPoste);
              
-                // calculs : cumuls pour chaque poste
-            $dto->totalHT = round($dto->totalHT + $cp->getMontantHT(), 2) ;
-            $dto->totalTTC = round($dto->totalTTC + $cp->getMontantTTC(), 2) ;
-            $dto->totalFournitures = round($dto->totalFournitures + $cp->getMontantFournitures(), 2); 
-            $dto->totalMainOeuvre = round($dto->totalMainOeuvre + $posteDto->montantMainOeuvre, 2);
-            $dto->totalPrestataire = round($dto->totalPrestataire + $cp->getMontantPrestataire(), 2);
-            $dto->totalNbTrajets = $dto->totalNbTrajets + $posteDto->nbTrajets ;
+            // calculs : cumuls pour chaque poste
+            $dto->totalHT = round($dto->totalHT + (float) $posteDto->montantHT, 2);
+            $dto->totalTTC = round($dto->totalTTC + (float) $posteDto->montantTTC, 2);
+            $dto->totalFournitures = round($dto->totalFournitures + (float) $posteDto->montantFournitures, 2);
+            $dto->totalPrestataire = round($dto->totalPrestataire + (float) $posteDto->montantPrestataire, 2);
+            $dto->totalMainOeuvre = round($dto->totalMainOeuvre + (float) $posteDto->montantMainOeuvre, 2);
+            $dto->totalNbTrajets += (int) $posteDto->nbTrajets;
                   
             /*foreach ($cp->getPoste()->getEtapes() as $etape) {
                 $chantierEtape = $etape->getChantierEtapes()->filter(fn($ce) => $ce->getChantier()->getId() === $chantier->getId())->first();
@@ -234,7 +234,7 @@ class ChantierService
             return 0.0;
         }
         return round(($numerator / $denominator) * 100, 2);
-}
+    }
    
 
 }

@@ -149,7 +149,10 @@ class ChantierService
         // fin de la boucle sur les postes
 
         // calcul du cout total chantier
-        $dto->totalTransport = $this->calculCoutTrajet($dto->totalNbTrajets, $chantier->getTempsTrajet(), $chantier->getCoefficient());
+        $tempsTrajet = (float) ($chantier->getTempsTrajet() ?? 0.0);
+        $coefficient = (float) ($chantier->getCoefficient() ?? 0.0);
+
+        $dto->totalTransport = $this->calculCoutTrajet($dto->totalNbTrajets,$tempsTrajet,$coefficient);
         $dto->totalMainOeuvreSansTransport = round($dto->totalMainOeuvre - $dto->totalTransport,2) ;
 
         $dto->totalCout = round($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire, 2);

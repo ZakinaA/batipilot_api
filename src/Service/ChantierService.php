@@ -43,56 +43,7 @@ class ChantierService
         }
         return $list_out;
     }
-
-    private function mapToListItem(Chantier $chantier): ChantierListItemOutput
-    {
-        $dto = new ChantierListItemOutput();
-        $dto->id = (int) $chantier->getId();
-        $dto->ville = $chantier->getVille();
-        $dto->dateDemarrage = $chantier->getDateDemarrage();
-        $dto->dateReception = $chantier->getDateReception();
-
-        $client = $chantier->getClient();
-        $dto->nomClient = $client ? ($client->getNom() ?? $client->getRaisonSociale() ?? null) : null; 
-        $dto->totalHT = $this->calculTotalHt($chantier);
-
-        return $dto;
-    }
-
-    private function calculTotalHt(Chantier $chantier): float
-    {
-        $total = 0.0;
-        foreach ($chantier->getChantierPostes() as $chantierPoste) {
-            $total += (float) ($chantierPoste->getMontantHT() ?? 0.0);
-        }
-        // arrondi 
-        return round($total, 2);
-    }
-
-    /**
-     * Retourne l'état en string selon les dates
-     * Démarré : date de démarrage <= date du jour
-     * A venir : date de démarrage > date du jour
-     * Terminé : date de réception 
-     */
-    private function getEtatChantier(Chantier $chantier): string
-    {
-        $today = new \DateTimeImmutable('today');
-
-        if ($chantier->getDateReception() !== null && $chantier->getDateReception() > $today ) {
-            return 'termine';
-        }
-
-        if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() <= $today ) {
-            return 'demarre';
-        }
-        if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() > $today ) {
-            return 'a_venir';
-        }
-        return 'a_venir';
-    }
-
-    /**
+     /**
      * Retourne les informations générales du chantier + totalHT
      */
     public function showOverview(Chantier $chantier): ChantierOverviewOutput
@@ -151,19 +102,6 @@ class ChantierService
             $dto->equipe = $chantier->getEquipe()->getNom();
         }   
 
-        // initialisation des variables de calcul
-        $dto->totalHT = 0 ;
-        $dto->totalTTC = 0;
-        $dto->totalNbJoursTravailles = 0;
-        $dto->totalNbTrajets = 0 ;
-        $dto->totalPrestataire = 0;
-        $dto->totalMainOeuvre = 0;
-        $dto->totalMainOeuvreSansTransport = 0;
-        $dto->totalTransport = 0;
-
-        $dto->marge = 0;
-        $dto->tauxMarge = 0;
-    
         foreach ($chantier->getChantierPostes() as $cp) {
             $posteDto = new ChantierPosteKpiOutput();
             $posteDto->id = $cp->getId();
@@ -221,6 +159,57 @@ class ChantierService
     
         return $dto ;
     }
+
+    // Mappe un chantier en Dto Chantier plus simple utilisé dans la liste des chantiers
+    private function mapToListItem(Chantier $chantier): ChantierListItemOutput
+    {
+        $dto = new ChantierListItemOutput();
+        $dto->id = (int) $chantier->getId();
+        $dto->ville = $chantier->getVille();
+        $dto->dateDemarrage = $chantier->getDateDemarrage();
+        $dto->dateReception = $chantier->getDateReception();
+
+        $client = $chantier->getClient();
+        $dto->nomClient = $client ? ($client->getNom() ?? $client->getRaisonSociale() ?? null) : null; 
+        $dto->totalHT = $this->calculTotalHt($chantier);
+
+        return $dto;
+    }
+
+    private function calculTotalHt(Chantier $chantier): float
+    {
+        $total = 0.0;
+        foreach ($chantier->getChantierPostes() as $chantierPoste) {
+            $total += (float) ($chantierPoste->getMontantHT() ?? 0.0);
+        }
+        // arrondi 
+        return round($total, 2);
+    }
+
+    /**
+     * Retourne l'état en string selon les dates
+     * Démarré : date de démarrage <= date du jour
+     * A venir : date de démarrage > date du jour
+     * Terminé : date de réception 
+     */
+    private function getEtatChantier(Chantier $chantier): string
+    {
+        $today = new \DateTimeImmutable('today');
+
+        if ($chantier->getDateReception() !== null && $chantier->getDateReception() > $today ) {
+            return 'termine';
+        }
+
+        if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() <= $today ) {
+            return 'demarre';
+        }
+        if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() > $today ) {
+            return 'a_venir';
+        }
+        return 'a_venir';
+    }
+
+   
 
     // 1 journée = 7h = 420 min
     // coutTrajetChantier = nbTrajets * 420/ coefficient

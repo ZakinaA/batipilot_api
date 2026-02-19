@@ -1,7 +1,7 @@
 <?php
 namespace App\Dto\Chantier;
 
-use App\Dto\Client\ChantierPosteKpiOutput;
+use App\Dto\Chantier\ChantierPosteKpiOutput;
 
 class ChantierKpiOutput
 {
@@ -13,23 +13,20 @@ class ChantierKpiOutput
     public ?float $coefficient = null;
     public ?string $equipe = null;
 
-    // variables totales chantier
+    // Totaux chantier (par défaut 0)
+    public float $totalHT = 0.0;
+    public float $totalTTC = 0.0;
+    public float $totalFournitures = 0.0;
+    public float $totalNbJoursTravailles = 0.0; // ou int si c’est un entier
+    public int $totalNbTrajets = 0;
+    public float $totalPrestataire = 0.0;
+    public float $totalMainOeuvre = 0.0;
+    public float $totalMainOeuvreSansTransport = 0.0;
+    public float $totalTransport = 0.0;
+    public float $totalCout = 0.0;
+    public float $marge = 0.0;
+    public float $tauxMarge = 0.0;
 
-    public ?float $totalHT = null;
-    public ?float $totalTTC = null;
-    public ?float $totalFournitures = null;
-    public ?float $totalNbJoursTravailles = null;
-    public ?int $totalNbTrajets = null;
-    public ?float $totalPrestataire = null;
-    public ?float $totalMainOeuvre = null;
-    public ?float $totalMainOeuvreSansTransport = null;
-    public ?float $totalTransport = null;
-    public ?float $totalCout = null;
-    public ?float $marge = null;
-    public ?float $tauxMarge = null;
-
- 
-
-    /** @var ChantierPosteOutput[] */
+    /** @var ChantierPosteKpiOutput[] */
     public array $postes = [];
 }

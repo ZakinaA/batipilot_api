@@ -107,11 +107,11 @@ class ChantierService
             $posteDto->id = $cp->getId();
             $posteDto->libelle = $cp->getPoste()->getLibelle();
             
-            $posteDto->montantHT = $cp->getMontantHT();
-            $posteDto->montantTTC = $cp->getMontantTTC();
-            $posteDto->montantFournitures = $cp->getMontantFournitures();
-            $posteDto->nbJoursTravailles = $cp->getNbJoursTravailles();
-            $posteDto->montantPrestataire = $cp->getMontantPrestataire();
+            $posteDto->montantHT = (float) ($cp->getMontantHT() ?? 0.0);
+            $posteDto->montantTTC = (float) ($cp->getMontantTTC() ?? 0.0);
+            $posteDto->montantFournitures = (float) ($cp->getMontantFournitures() ?? 0.0);
+            $posteDto->nbJoursTravailles = (float) ($cp->getNbJoursTravailles() ?? 0.0);
+            $posteDto->montantPrestataire = (float) ($cp->getMontantPrestataire() ?? 0.0);
             $posteDto->nbTrajets = ceil($posteDto->nbJoursTravailles)*2;
             $posteDto->montantMainOeuvre =  $posteDto->nbJoursTravailles * $chantier->getCoefficient() ;
             $posteDto->montantCoutPoste = round($posteDto->montantFournitures + $posteDto->montantPrestataire + $posteDto->montantMainOeuvre,2);

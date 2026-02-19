@@ -116,8 +116,8 @@ class ChantierService
             $posteDto->montantMainOeuvre =  $posteDto->nbJoursTravailles * $chantier->getCoefficient() ;
             $posteDto->montantCoutPoste = round($posteDto->montantFournitures + $posteDto->montantPrestataire + $posteDto->montantMainOeuvre,2);
             $posteDto->margePoste = round($posteDto->montantHT -$posteDto->montantCoutPoste ,2) ;
-            $posteDto->tauxMargePoste = round( (($posteDto->montantHT - $posteDto->montantCoutPoste) / $posteDto->montantCoutPoste *100),2);
-            
+            //$posteDto->tauxMargePoste = round( (($posteDto->montantHT - $posteDto->montantCoutPoste) / $posteDto->montantCoutPoste *100),2);
+            $posteDto->tauxMargePoste = $this->safePercent($posteDto->margePoste,$posteDto->montantCoutPoste);
              
                 // calculs : cumuls pour chaque poste
             $dto->totalHT = round($dto->totalHT + $cp->getMontantHT(), 2) ;
@@ -158,7 +158,7 @@ class ChantierService
         $dto->totalCout = round($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire, 2);
         $dto->marge = round($dto->totalHT - $dto->totalCout,2);
         //calcul de la marge
-        $dto->tauxMarge = round((($dto->totalHT - $dto->totalCout) / $dto->totalCout)*100,2);
+        $dto->tauxMarge = $this->safePercent($dto->totalHT - $dto->totalCout,$dto->totalCout);
     
         return $dto ;
     }
@@ -216,14 +216,25 @@ class ChantierService
 
     // 1 journée = 7h = 420 min
     // coutTrajetChantier = nbTrajets * 420/ coefficient
-    private function calculCoutTrajet(int $nbTrajets, float $tempsTrajet, float $coeff): float
+    private function calculCoutTrajet(int $nbTrajets, float $tempsTrajet, float $coefficient): float
     {
-        if ($nbTrajets <= 0 || $tempsTrajet <= 0 || $coeff <= 0) {
+        if ($nbTrajets <= 0 || $tempsTrajet <= 0.0 || $coefficient <= 0.0) {
             return 0.0;
         }
-        $coutParMinute = $coeff / 420;
+
+        // coût/minute = coefficient / 420 (7h)
+        $coutParMinute = $coefficient / 420;
+
         return round($nbTrajets * $tempsTrajet * $coutParMinute,2);
     }
+
+    private function safePercent(float $numerator, float $denominator): float
+    {
+        if ($denominator <= 0.0) {
+            return 0.0;
+        }
+        return round(($numerator / $denominator) * 100, 2);
+}
    
 
 }

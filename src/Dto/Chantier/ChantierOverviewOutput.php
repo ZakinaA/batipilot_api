@@ -24,5 +24,9 @@ class ChantierOverviewOutput
 
     // variable de calcul
     public ?float $totalHT = null;
+
+
+    // rajouter la pièce à demander : demande préalable ou permis de construire
+    // mettre les conditions de la pièce demandée dans les paramètres de l'application
     
 }

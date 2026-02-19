@@ -29,6 +29,23 @@ class ChantierController extends AbstractController
         );
     
     }
+
+    #[Route('/show_overview/{id}', name: 'chantier_show_overview', methods: ['GET'])]
+    public function showOverview(int $id): JsonResponse
+    {
+        $chantier = $this->repository->find($id);
+        if (!$chantier) {
+            return $this->json(['error' => 'Chantier non trouvé'], 404);
+        }
+        else
+        {
+            return $this->json(
+                $this->chantierService->showOverview($chantier)
+            ); 
+        }
+        return $this->json($dto);
+    }
+
     
     #[Route('/show/{id}', name: 'chantier_show', methods: ['GET'])]
     public function show(int $id): JsonResponse

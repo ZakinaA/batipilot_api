@@ -8,6 +8,7 @@ use App\Dto\Client\ChantierClientOutput;
 use App\Dto\Chantier\ChantierPosteOutput;
 use App\Dto\Chantier\ChantierDetailOutput;
 use App\Dto\Chantier\ChantierListParEtatOutput;
+use App\Dto\Chantier\ChantierOverviewOutput;
 use App\Dto\Client\ClientDetailOutput;
 use App\Dto\Chantier\ChantierListItemOutput;
 use App\Entity\Chantier;
@@ -52,12 +53,12 @@ class ChantierService
 
         $client = $chantier->getClient();
         $dto->nomClient = $client ? ($client->getNom() ?? $client->getRaisonSociale() ?? null) : null; 
-        $dto->totalHT = $this->calculTotalVenduHt($chantier);
+        $dto->totalHT = $this->calculTotalHt($chantier);
 
         return $dto;
     }
 
-    private function calculTotalVenduHt(Chantier $chantier): float
+    private function calculTotalHt(Chantier $chantier): float
     {
         $total = 0.0;
         foreach ($chantier->getChantierPostes() as $chantierPoste) {
@@ -88,6 +89,50 @@ class ChantierService
         }
         return 'a_venir';
     }
+
+    /**
+     * Retourne le détail d’un chantier
+     */
+    public function showOverview($chantier): ChantierOverviewOutput
+    {
+
+        $dto = new ChantierOverviewOutput();
+        $dto->id = $chantier->getId();
+        $dto->adresse = $chantier->getAdresse();
+        $dto->copos = $chantier->getCopos();
+        $dto->ville = $chantier->getVille();
+        $dto->dateDebutPrevue = $chantier->getDateDebutPrevue();
+        $dto->dateDemarrage = $chantier->getDateDemarrage();
+        $dto->dateReception = $chantier->getDateReception();
+        $dto->dateFin = $chantier->getDateFin();
+        $dto->surfacePlancher = $chantier->getSurfacePlancher();
+        $dto->surfaceHabitable = $chantier->getSurfaceHabitable();
+        $dto->distanceDepot = $chantier->getDistanceDepot();
+        $dto->tempsTrajet = $chantier->getTempsTrajet();
+        $dto->coefficient = $chantier->getCoefficient();
+        $dto->alerte = $chantier->getAlerte();
+
+        // variables de calcul
+        $dto->totalHT = $this->calculTotalHt($chantier);
+
+        // Équipe : juste le nom
+        if ($chantier->getEquipe()) {
+            $dto->equipe = $chantier->getEquipe()->getNom();
+        }
+
+        // Infos Client
+        if ($chantier->getClient()) {
+            $clientDto = new ClientDetailOutput();
+            //$clientDto->id = $chantier->getClient()->getId();
+            $clientDto->nom = $chantier->getClient()->getNom();
+            $clientDto->prenom = $chantier->getClient()->getPrenom();
+            $clientDto->telephone = $chantier->getClient()->getTelephone();
+            $clientDto->mail = $chantier->getClient()->getMail();
+            $dto->client = $clientDto;
+        }
+        return $dto ;
+    }
+
 
     /**
      * Retourne le détail d’un chantier

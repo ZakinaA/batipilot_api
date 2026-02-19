@@ -7,7 +7,9 @@ use App\Dto\Chantier\ChantierMiniOutput;
 use App\Dto\Client\ChantierClientOutput;
 use App\Dto\Chantier\ChantierPosteOutput;
 use App\Dto\Chantier\ChantierDetailOutput;
+use App\Dto\Chantier\ChantierListParEtatOutput;
 use App\Dto\Client\ClientDetailOutput;
+use App\Dto\Chantier\ChantierListItemOutput;
 use App\Entity\Chantier;
 
 class ChantierService
@@ -16,42 +18,75 @@ class ChantierService
         private ChantierRepository $chantierRepository
     ) {}
 
-
-    /**
-     * Liste les chantiers démarrés, à venir, terminés
+    /* Liste les chantiers démarrés, à venir et terminés
+     * Renvoie ChantierListParEtatOutput qui est un array des 3 listes
      */
-    public function list(): array //ChantierListOutput
+    public function list(): ChantierListParEtatOutput
     {
-        $today = new \DateTime();
-        $chantiers = $this->chantierRepository->findAll();
+        //$chantiers = $this->chantierRepository->findAll();
+        $chantiers = $this->chantierRepository->findAvecClientEtPostes();
 
-        $result = [
-            'aVenir' => [],
-            'demarres' => [],
-            'termines' => [],
-        ];
+        $list_out = new ChantierListParEtatOutput();
 
         foreach ($chantiers as $chantier) {
+            $chantierOut = $this->mapToListItem($chantier);
+            $etat = $this->getEtatChantier($chantier);
 
-            $output = $this->mapToListItem($chantier);
+            match ($etat) {
+                'demarre' => $list_out->demarres[] = $chantierOut,
+                'a_venir' => $list_out->aVenir[] = $chantierOut,
+                'termine' => $list_out->termines[] = $chantierOut,
+                default => $list_out->aVenir[] = $chantierOut,
+            };
+        }
+        return $list_out;
+    }
 
-            if ($this->isTermine($chantier)) {
-                $result['termines'][] = $output;
-            } elseif ($this->isDemarre($chantier)) {
-                $result['demarres'][] = $output;
-            } else {
-                $result['aVenir'][] = $output;
-            }
+    private function mapToListItem(Chantier $chantier): ChantierListItemOutput
+    {
+        $dto = new ChantierListItemOutput();
+        $dto->id = (int) $chantier->getId();
+        $dto->ville = $chantier->getVille();
+        $dto->dateDemarrage = $chantier->getDateDemarrage();
+        $dto->dateReception = $chantier->getDateReception();
+
+        $client = $chantier->getClient();
+        $dto->nomClient = $client ? ($client->getNom() ?? $client->getRaisonSociale() ?? null) : null; 
+        $dto->totalHT = $this->calculTotalVenduHt($chantier);
+
+        return $dto;
+    }
+
+    private function calculTotalVenduHt(Chantier $chantier): float
+    {
+        $total = 0.0;
+        foreach ($chantier->getChantierPostes() as $chantierPoste) {
+            $total += (float) ($chantierPoste->getMontantHT() ?? 0.0);
+        }
+        // arrondi 
+        return round($total, 2);
+    }
+
+    /**
+     * Retourne l'état en string selon les dates
+     * Démarré : date de démarrage <= date du jour
+     * A venir : date de démarrage > date du jour
+     * Terminé : date de réception 
+     */
+    private function getEtatChantier(Chantier $chantier): string
+    {
+        $today = new \DateTimeImmutable('today');
+        if ($chantier->getDateReception() !== null || $chantier->getDateReception() > $today ) {
+            return 'termine';
         }
 
-        //Tris
-       // Les Terminés : Du plus récent au plus ancien
-       // Les Démarrés : Du plus ancien au plus récent
-       // À Venir : Le plus proche arrive en premier
-        usort($result['termines'], fn($a, $b) => $b->dateReception <=> $a->dateReception);
-        usort($result['demarres'], fn($a, $b) => $a->dateDemarrage <=> $b->dateDemarrage);
-        usort($result['aVenir'], fn($a, $b) => $a->dateDebutPrevue <=> $b->dateDebutPrevue);
-        return $result;     
+        if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() <= $today ) {
+            return 'demarre';
+        }
+        if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() > $today ) {
+            return 'demarre';
+        }
+        return 'a_venir';
     }
 
     /**
@@ -151,54 +186,6 @@ class ChantierService
         $dto->marge = round((($dto->totalVenduHT - $dto->totalCout) / $dto->totalCout)*100,2);
     
         return $dto ;
-    }
-
-
-    private function isDemarre(Chantier $chantier): bool
-    {
-        $today = new \DateTimeImmutable('today'); // 'today' fixe l'heure à 00:00:00
-        $dateDemarrage = $chantier->getDateDemarrage();
-
-        return $dateDemarrage !== null 
-            && $dateDemarrage <= $today 
-            && $chantier->getDateReception() === null;
-    }
-
-    private function isTermine(Chantier $chantier): bool
-    {
-       $today = new \DateTimeImmutable();
-
-        return $chantier->getDateReception()
-            && $chantier->getDateReception() <= $today ;
-    }
-
-     private function isAVenir(Chantier $chantier): bool
-    {
-       $today = new \DateTimeImmutable();
-
-       return $chantier->getDateDebut() !== null 
-        && $chantier->getDateDebut() > $today 
-        && $chantier->getDateDemarrage() === null;
-
-    }
-
-    /**
-     * Mapping  pour la liste des démarrés, à venir, archivés
-     */
-    private function mapToListItem(Chantier $chantier): ChantierMiniOutput
-    {
-        $mini = new ChantierMiniOutput();
-
-        $mini->id = $chantier->getId();
-        $mini->nomClient = $chantier->getClient()?->getNom();
-        $mini->ville = $chantier->getVille();
-        $mini->dateDebutPrevue = $chantier->getDateDebutPrevue();
-        $mini->dateDemarrage = $chantier->getDateDemarrage();
-        $mini->dateReception = $chantier->getDateReception();
-        $mini->dateFin = $chantier->getDateFin();
-
-        return $mini;    
-
     }
 
 }

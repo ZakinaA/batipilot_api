@@ -6,7 +6,8 @@ use App\Repository\ChantierRepository;
 use App\Dto\Chantier\ChantierMiniOutput;
 use App\Dto\Client\ChantierClientOutput;
 use App\Dto\Chantier\ChantierPosteOutput;
-use App\Dto\Chantier\ChantierDetailOutput;
+use App\Dto\Chantier\ChantierKpiOutput;
+use App\Dto\Chantier\ChantierPosteKpiOutput;
 use App\Dto\Chantier\ChantierListParEtatOutput;
 use App\Dto\Chantier\ChantierOverviewOutput;
 use App\Dto\Client\ClientDetailOutput;
@@ -91,7 +92,7 @@ class ChantierService
     }
 
     /**
-     * Retourne le détail d’un chantier
+     * Retourne les informations générales du chantier + totalHT
      */
     public function showOverview($chantier): ChantierOverviewOutput
     {
@@ -135,74 +136,59 @@ class ChantierService
 
 
     /**
-     * Retourne le détail d’un chantier
+     * Retourne les informations financières du chantier
      */
-    public function show($chantier): ChantierDetailOutput
+    public function showKpi($chantier): ChantierKpiOutput
     {
-
-        $dto = new ChantierDetailOutput();
+ 
+        $dto = new ChantierKpiOutput();
         $dto->id = $chantier->getId();
-        $dto->adresse = $chantier->getAdresse();
-        $dto->copos = $chantier->getCopos();
+        $dto->nomClient = $chantier->getClient()->getNom();
         $dto->ville = $chantier->getVille();
-        $dto->dateDebutPrevue = $chantier->getDateDebutPrevue();
-        $dto->dateDemarrage = $chantier->getDateDemarrage();
-        $dto->dateReception = $chantier->getDateReception();
-        $dto->dateFin = $chantier->getDateFin();
-        $dto->surfacePlancher = $chantier->getSurfacePlancher();
-        $dto->surfaceHabitable = $chantier->getSurfaceHabitable();
-        $dto->distanceDepot = $chantier->getDistanceDepot();
-        $dto->tempsTrajet = $chantier->getTempsTrajet();
-        $dto->coefficient = $chantier->getCoefficient();
-        $dto->alerte = $chantier->getAlerte();
-
-        // variables de calcul
-        $dto->totalVenduHT = 0 ;
-        $dto->totalVenduTTC = 0;
-
-        $dto->totalFournitures = 0;
-        $dto->totalMainOeuvre = 0;
-        $dto->totalPrestataire = 0;
-        $dto->cout = 0;
-        $dto->marge = 0;
-       
-
         // Équipe : juste le nom
         if ($chantier->getEquipe()) {
             $dto->equipe = $chantier->getEquipe()->getNom();
-        }
+        }   
 
-        // Infos Client
-        if ($chantier->getClient()) {
-            $clientDto = new ClientDetailOutput();
-            //$clientDto->id = $chantier->getClient()->getId();
-            $clientDto->nom = $chantier->getClient()->getNom();
-            $clientDto->prenom = $chantier->getClient()->getPrenom();
-            $clientDto->telephone = $chantier->getClient()->getTelephone();
-            $clientDto->mail = $chantier->getClient()->getMail();
-            $dto->client = $clientDto;
-        }
+        // initialisation des variables de calcul
+        $dto->totalHT = 0 ;
+        $dto->totalTTC = 0;
+        $dto->totalNbJoursTravailles = 0;
+        $dto->totalNbTrajets = 0 ;
+        $dto->totalPrestataire = 0;
+        $dto->totalMainOeuvre = 0;
+        $dto->totalMainOeuvreSansTransport = 0;
+        $dto->totalTransport = 0;
 
-       
-
+        $dto->marge = 0;
+        $dto->tauxMarge = 0;
+    
         foreach ($chantier->getChantierPostes() as $cp) {
-            $posteDto = new ChantierPosteOutput();
+            $posteDto = new ChantierPosteKpiOutput();
             $posteDto->id = $cp->getId();
             $posteDto->libelle = $cp->getPoste()->getLibelle();
+            
             $posteDto->montantHT = $cp->getMontantHT();
             $posteDto->montantTTC = $cp->getMontantTTC();
             $posteDto->montantFournitures = $cp->getMontantFournitures();
             $posteDto->nbJoursTravailles = $cp->getNbJoursTravailles();
             $posteDto->montantPrestataire = $cp->getMontantPrestataire();
-            $posteDto->coutMainOeuvre = round( ($cp->getNbJoursTravailles() * $chantier->getCoefficient()), 2);
-
-            // calculs : cumuls pour chaque poste
-            $dto->totalVenduHT = round($dto->totalVenduHT + $cp->getMontantHT(), 2) ;
-            $dto->totalVenduTTC = round($dto->totalVenduTTC + $cp->getMontantTTC(), 2) ;
-
+            $posteDto->nbTrajets = ceil($posteDto->nbJoursTravailles)*2;
+            $posteDto->montantMainOeuvre =  $posteDto->nbJoursTravailles * $chantier->getCoefficient() ;
+            $posteDto->montantCoutPoste = round($posteDto->montantFournitures + $posteDto->montantPrestataire + $posteDto->montantMainOeuvre,2);
+            $posteDto->margePoste = round($posteDto->montantHT -$posteDto->montantCoutPoste ,2) ;
+            $posteDto->tauxMargePoste = round( (($posteDto->montantHT - $posteDto->montantCoutPoste) / $posteDto->montantCoutPoste *100),2);
+            
+             
+                // calculs : cumuls pour chaque poste
+            $dto->totalHT = round($dto->totalHT + $cp->getMontantHT(), 2) ;
+            $dto->totalTTC = round($dto->totalTTC + $cp->getMontantTTC(), 2) ;
             $dto->totalFournitures = round($dto->totalFournitures + $cp->getMontantFournitures(), 2); 
-            $dto->totalMainOeuvre = round($dto->totalMainOeuvre + $posteDto->coutMainOeuvre, 2);
+            $dto->totalMainOeuvre = round($dto->totalMainOeuvre + $posteDto->montantMainOeuvre, 2);
             $dto->totalPrestataire = round($dto->totalPrestataire + $cp->getMontantPrestataire(), 2);
+            $dto->totalNbTrajets = $dto->totalNbTrajets + $posteDto->nbTrajets ;
+
+
             
             /*foreach ($cp->getPoste()->getEtapes() as $etape) {
                 $chantierEtape = $etape->getChantierEtapes()->filter(fn($ce) => $ce->getChantier()->getId() === $chantier->getId())->first();
@@ -223,14 +209,29 @@ class ChantierService
 
             $dto->postes[] = $posteDto;
         }
+        // fin de la boucle sur les postes
 
         // calcul du cout total chantier
-        $dto->totalCout = round($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire, 2);
+        $dto->totalTransport = round(($dto->totalNbTrajets*$chantier->getTempsTrajet())* $chantier->getCoefficient()/ 420 ,2);
+        $dto->totalMainOeuvreSansTransport = round($dto->totalMainOeuvre - $dto->totalTransport,2) ;
 
+        $dto->totalCout = round($dto->totalFournitures + $dto->totalMainOeuvre+ $dto->totalPrestataire, 2);
+        $dto->marge = round($dto->totalHT - $dto->totalCout,2);
         //calcul de la marge
-        $dto->marge = round((($dto->totalVenduHT - $dto->totalCout) / $dto->totalCout)*100,2);
+        $dto->tauxMarge = round((($dto->totalHT - $dto->totalCout) / $dto->totalCout)*100,2);
     
         return $dto ;
+    }
+
+
+     /**
+     * 
+     */
+    private function getCoutTrajet(Chantier $chantier): float
+    {
+        //1 journée = 7h = 420 min
+        // 420min = coefficient
+        // coutTrajetChantier = nbTrajets * 420/ coefficient
     }
 
 }

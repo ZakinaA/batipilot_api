@@ -7,6 +7,8 @@ use App\Dto\Chantier\ChantierMiniOutput;
 use App\Dto\Chantier\ChantierDetailOutput;
 use App\Dto\Client\ClientDetailOutput;
 use App\Dto\Chantier\ChantierPosteOutput;
+use App\Dto\Chantier\ChantierPosteKpiOutput;
+use App\Dto\Chantier\ChantierKpiOutput;
 use App\Dto\Chantier\ChantierEtapeOutput;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -47,8 +49,8 @@ class ChantierController extends AbstractController
     }
 
     
-    #[Route('/show/{id}', name: 'chantier_show', methods: ['GET'])]
-    public function show(int $id): JsonResponse
+    #[Route('/show_kpi/{id}', name: 'chantier_show', methods: ['GET'])]
+    public function showKpi(int $id): JsonResponse
     {
         $chantier = $this->repository->find($id);
         if (!$chantier) {
@@ -57,7 +59,7 @@ class ChantierController extends AbstractController
         else
         {
             return $this->json(
-                $this->chantierService->show($chantier)
+                $this->chantierService->showKpi($chantier)
             ); 
         }
         return $this->json($dto);

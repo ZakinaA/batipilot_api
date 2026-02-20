@@ -2,7 +2,7 @@
 
 namespace App\Dto\Chantier;
 
-class ChantierPostesEtapesOutput
+class ChantierPostesOutput
 {
     public int $id;
     public ?string $nomClient = null;

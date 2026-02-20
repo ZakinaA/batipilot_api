@@ -19,12 +19,16 @@ use App\Dto\Etape\EtapeValueOutput;
 use App\Entity\ChantierEtape;
 use App\Entity\Etape;
 use App\Service\Chantier\Domain\ChantierEtatManager;
+use App\Service\Chantier\Domain\ChantierFinanceCalculator;
+use App\Service\Chantier\Query\ChantierHeaderBuilder;
 
 class ChantierService
 {
     public function __construct(
         private ChantierRepository $chantierRepository,
-        private ChantierEtatManager $etatManager
+        private ChantierEtatManager $etatManager,
+        private ChantierFinanceCalculator $calculator,
+        private ChantierHeaderBuilder $headerBuilder
     ) {}
 
     /* Liste les chantiers démarrés, à venir et terminés
@@ -57,10 +61,12 @@ class ChantierService
     {
 
         $dto = new ChantierOverviewOutput();
-        $dto->id = $chantier->getId();
+
+        $dto->header = $this->headerBuilder->build($chantier);
+       
         $dto->adresse = $chantier->getAdresse();
         $dto->copos = $chantier->getCopos();
-        $dto->ville = $chantier->getVille();
+        
         $dto->dateDebutPrevue = $chantier->getDateDebutPrevue();
         $dto->dateDemarrage = $chantier->getDateDemarrage();
         $dto->dateReception = $chantier->getDateReception();
@@ -71,14 +77,6 @@ class ChantierService
         $dto->tempsTrajet = $chantier->getTempsTrajet();
         $dto->coefficient = $chantier->getCoefficient();
         $dto->alerte = $chantier->getAlerte();
-
-        // variables de calcul
-        $dto->totalHT = $this->calculTotalHt($chantier);
-
-        // Équipe : juste le nom
-        if ($chantier->getEquipe()) {
-            $dto->equipe = $chantier->getEquipe()->getNom();
-        }
 
         // Infos Client
         if ($chantier->getClient()) {
@@ -165,7 +163,8 @@ class ChantierService
 
         $client = $chantier->getClient();
         $dto->nomClient = $client ? ($client->getNom() ?? $client->getRaisonSociale() ?? null) : null; 
-        $dto->totalHT = $this->calculTotalHt($chantier);
+        //$dto->totalHT = $this->calculTotalHt($chantier);
+        $dto->totalHT = $this->calculator->getTotalHT($chantier);
 
         return $dto;
     }

@@ -2,7 +2,7 @@
 
 namespace App\Dto\Chantier;
 use App\Dto\Client\ClientDetailOutput;
-use App\Dto\Chantier\Common\ChantierHeaderOutput;
+use App\Dto\Chantier\Commun\ChantierHeaderOutput;
 
 class ChantierOverviewOutput
 {

@@ -4,7 +4,7 @@ namespace App\Dto\Chantier;
 
 use App\Dto\Etape\EtapeValueOutput;
 
-class ChantierPosteEtapeOutput
+class ChantierPosteEtapesOutput
 {
     public int $id;
     public ?string $libelle = null;

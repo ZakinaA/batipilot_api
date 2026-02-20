@@ -2,16 +2,18 @@
 namespace App\Dto\Chantier;
 
 use App\Dto\Chantier\ChantierPosteKpiOutput;
+use App\Dto\Chantier\Commun\ChantierHeaderOutput;
 
 class ChantierKpiOutput
 {
-    public int $id;
-    public ?string $nomClient = null;
-    public ?string $ville = null;
+    public ChantierHeaderOutput $header;
+    //public int $id;
+    //public ?string $nomClient = null;
+    //public ?string $ville = null;
     public ?\DateTime $dateDemarrage = null;
     public ?\DateTime $dateReception = null;
     public ?float $coefficient = null;
-    public ?string $equipe = null;
+    //public ?string $equipe = null;
 
     // Totaux chantier (par défaut 0)
     public float $totalHT = 0.0;

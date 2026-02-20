@@ -1,7 +1,7 @@
 <?php
 namespace App\Dto\Chantier;
 
-use App\Dto\Chantier\Common\ChantierHeaderOutput;
+use App\Dto\Chantier\Commun\ChantierHeaderOutput;
 
 class ChantierListItemOutput
 {

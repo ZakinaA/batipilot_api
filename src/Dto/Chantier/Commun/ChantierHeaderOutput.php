@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Dto\Chantier\Common;
+namespace App\Dto\Chantier\Commun;
 
 class ChantierHeaderOutput
 {

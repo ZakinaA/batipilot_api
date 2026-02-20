@@ -99,13 +99,14 @@ class ChantierService
     {
  
         $dto = new ChantierKpiOutput();
-        $dto->id = $chantier->getId();
-        $dto->nomClient = $chantier->getClient()->getNom();
-        $dto->ville = $chantier->getVille();
-        // Équipe : juste le nom
+        $dto->header = $this->headerBuilder->build($chantier);
+        //$dto->id = $chantier->getId();
+        //$dto->nomClient = $chantier->getClient()->getNom();
+        //$dto->ville = $chantier->getVille();
+        /* Équipe : juste le nom
         if ($chantier->getEquipe()) {
             $dto->equipe = $chantier->getEquipe()->getNom();
-        }   
+        } */  
 
         foreach ($chantier->getChantierPostes() as $cp) {
             $posteDto = new ChantierPosteKpiOutput();

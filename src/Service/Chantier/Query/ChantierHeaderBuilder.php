@@ -2,7 +2,7 @@
 
 namespace App\Service\Chantier\Query;
 
-use App\Dto\Chantier\Common\ChantierHeaderOutput;
+use App\Dto\Chantier\Commun\ChantierHeaderOutput;
 use App\Entity\Chantier;
 use App\Service\Chantier\Domain\ChantierFinanceCalculator;
 

@@ -338,8 +338,4 @@ private function mapEtapeDisplayValue(Etape $etape, ChantierEtape $chantierEtape
     return $dto;
 }
 
-
-
-    
-
 }

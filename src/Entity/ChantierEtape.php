@@ -39,7 +39,9 @@ class ChantierEtape
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $valDate = null;
 
-    #[ORM\Column(nullable: true)]
+    /*#[ORM\Column(nullable: true)]
+    private ?\DateTime $valDateHeure = null;*/
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $valDateHeure = null;
 
     public function getId(): ?int

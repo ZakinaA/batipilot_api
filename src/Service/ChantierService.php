@@ -13,6 +13,11 @@ use App\Dto\Chantier\ChantierOverviewOutput;
 use App\Dto\Client\ClientDetailOutput;
 use App\Dto\Chantier\ChantierListItemOutput;
 use App\Entity\Chantier;
+use App\Dto\Chantier\ChantierPostesEtapesOutput;
+use App\Dto\Chantier\ChantierPosteEtapesOutput;
+use App\Dto\Etape\EtapeValueOutput;
+use App\Entity\ChantierEtape;
+use App\Entity\Etape;
 
 class ChantierService
 {
@@ -163,6 +168,8 @@ class ChantierService
         return $dto ;
     }
 
+   
+
     // Mappe un chantier en Dto Chantier plus simple utilisé dans la liste des chantiers
     private function mapToListItem(Chantier $chantier): ChantierListItemOutput
     {
@@ -236,5 +243,125 @@ class ChantierService
         return round(($numerator / $denominator) * 100, 2);
     }
    
+
+
+    //méthodes pour
+
+public function showEtapes(Chantier $chantier): ChantierPostesEtapesOutput
+{
+    $dto = new ChantierPostesEtapesOutput();
+    $dto->id = (int) $chantier->getId();
+    $dto->nomClient = $chantier->getClient()?->getNom();
+    $dto->ville = $chantier->getVille();
+
+    // Option perf simple: indexer les ChantierEtape du chantier par etape_id
+    $index = $this->indexChantierEtapesByEtapeId($chantier);
+
+    foreach ($chantier->getChantierPostes() as $cp) {
+        $posteDto = new ChantierPosteEtapesOutput();
+        $posteDto->id = (int) $cp->getId();
+        $posteDto->libelle = $cp->getPoste()?->getLibelle();
+        $posteDto->montantHT = (float) ($cp->getMontantHT() ?? 0.0);
+
+        foreach ($cp->getPoste()->getEtapes() as $etape) {
+            $chantierEtape = $index[$etape->getId()] ?? null;
+            if (!$chantierEtape) {
+                continue;
+            }
+
+            $posteDto->etapes[] = $this->mapEtapeDisplayValue($etape, $chantierEtape);
+        }
+
+        $dto->postes[] = $posteDto;
+    }
+
+    return $dto;
+}
+
+/**
+ * @return array<int, ChantierEtape> [etapeId => ChantierEtape]
+ */
+private function indexChantierEtapesByEtapeId(Chantier $chantier): array
+{
+    $index = [];
+    foreach ($chantier->getChantierEtapes() as $ce) {
+        $etapeId = $ce->getEtape()?->getId();
+        if ($etapeId !== null) {
+            $index[(int) $etapeId] = $ce;
+        }
+    }
+    return $index;
+}
+
+private function mapEtapeDisplayValue(Etape $etape, ChantierEtape $chantierEtape): EtapeValueOutput
+{
+    $dto = new EtapeValueOutput();
+    $dto->id = (int) $etape->getId();
+    $dto->libelle = $etape->getLibelle();
+
+    $formatOriginal = $etape->getEtapeFormat()?->getLibelle();
+    $dto->format = $formatOriginal;
+
+    $formatLabel = strtolower(trim($formatOriginal ?? ''));
+
+    switch ($formatLabel) {
+        case 'oui ou  non': // au cas où double espace
+        case 'oui ou non':
+            $b = $chantierEtape->isValBoolean();
+            $dto->displayValue = $b === null ? null : ($b ? 'Oui' : 'Non');
+            break;
+
+        case 'nombre entier':
+            $i = $chantierEtape->getValInteger();
+            $dto->displayValue = $i === null ? null : (string) $i;
+            break;
+
+        case 'nombre décimal':
+        case 'nombre decimal':
+            $f = $chantierEtape->getValFloat();
+            if ($f === null) {
+                $dto->displayValue = null;
+                break;
+            }
+            // Affichage FR: espace milliers, virgule décimale
+            $dto->displayValue = rtrim(rtrim(number_format($f, 2, ',', ' '), '0'), ',');
+            break;
+
+        case 'texte':
+            $t = $chantierEtape->getValText();
+            $dto->displayValue = ($t === null || $t === '') ? null : $t;
+            break;
+
+        case 'date':
+            $d = $chantierEtape->getValDate();
+            $dto->displayValue = $d?->format('d/m/Y');
+            break;
+
+        case 'date et heure':
+            $dt = $chantierEtape->getValDateHeure();
+            // ⚠️ ton entity a valDateHeure en ?DateTime mais mapping Doctrine "nullable: true" sans type Types::DATETIME
+            // ça marche quand même si Doctrine sait mapper; sinon il faudra typer la colonne correctement.
+            $dto->displayValue = $dt?->format('d/m/Y H:i');
+            break;
+
+        default:
+            // fallback “safe”: première valeur non nulle
+            $dto->displayValue =
+                $chantierEtape->getValText()
+                ?? ($chantierEtape->getValInteger() !== null ? (string) $chantierEtape->getValInteger() : null)
+                ?? ($chantierEtape->getValFloat() !== null ? rtrim(rtrim(number_format($chantierEtape->getValFloat(), 2, ',', ' '), '0'), ',') : null)
+                ?? ($chantierEtape->isValBoolean() !== null ? ($chantierEtape->isValBoolean() ? 'Oui' : 'Non') : null)
+                ?? $chantierEtape->getValDate()?->format('d/m/Y')
+                ?? $chantierEtape->getValDateHeure()?->format('d/m/Y H:i');
+
+            break;
+    }
+
+    return $dto;
+}
+
+
+
+    
 
 }

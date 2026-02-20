@@ -18,11 +18,13 @@ use App\Dto\Chantier\ChantierPosteEtapesOutput;
 use App\Dto\Etape\EtapeValueOutput;
 use App\Entity\ChantierEtape;
 use App\Entity\Etape;
+use App\Service\Chantier\Domain\ChantierEtatManager;
 
 class ChantierService
 {
     public function __construct(
-        private ChantierRepository $chantierRepository
+        private ChantierRepository $chantierRepository,
+        private ChantierEtatManager $etatManager
     ) {}
 
     /* Liste les chantiers démarrés, à venir et terminés
@@ -37,7 +39,7 @@ class ChantierService
 
         foreach ($chantiers as $chantier) {
             $chantierOut = $this->mapToListItem($chantier);
-            $etat = $this->getEtatChantier($chantier);
+            $etat = $this->etatManager->getEtat($chantier);
 
             match ($etat) {
                 'demarre' => $list_out->demarres[] = $chantierOut,
@@ -177,31 +179,6 @@ class ChantierService
         // arrondi 
         return round($total, 2);
     }
-
-    /**
-     * Retourne l'état en string selon les dates
-     * Démarré : date de démarrage <= date du jour
-     * A venir : date de démarrage > date du jour
-     * Terminé : date de réception 
-     */
-    private function getEtatChantier(Chantier $chantier): string
-    {
-        $today = new \DateTimeImmutable('today');
-
-        if ($chantier->getDateReception() !== null && $chantier->getDateReception() < $today ) {
-            return 'termine';
-        }
-
-        if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() <= $today ) {
-            return 'demarre';
-        }
-        if ($chantier->getDateDemarrage() !== null && $chantier->getDateDemarrage() > $today ) {
-            return 'a_venir';
-        }
-        return 'a_venir';
-    }
-
-   
 
     // 1 journée = 7h = 420 min
     // coutTrajetChantier = nbTrajets * 420/ coefficient

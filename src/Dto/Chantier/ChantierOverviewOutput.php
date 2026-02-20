@@ -7,7 +7,7 @@ use App\Dto\Chantier\Commun\ChantierHeaderOutput;
 class ChantierOverviewOutput
 {
     public ChantierHeaderOutput $header;
-    public int $id;
+    //public int $id;
     public ?string $adresse = null;
     public ?string $copos = null;
     //public ?string $ville = null;

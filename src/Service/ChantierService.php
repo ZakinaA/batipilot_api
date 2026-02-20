@@ -13,7 +13,7 @@ use App\Dto\Chantier\ChantierOverviewOutput;
 use App\Dto\Client\ClientDetailOutput;
 use App\Dto\Chantier\ChantierListItemOutput;
 use App\Entity\Chantier;
-use App\Dto\Chantier\ChantierPostesEtapesOutput;
+use App\Dto\Chantier\ChantierSuiviOutput;
 use App\Dto\Chantier\ChantierPosteEtapesOutput;
 use App\Dto\Etape\EtapeValueOutput;
 use App\Entity\ChantierEtape;
@@ -205,12 +205,10 @@ class ChantierService
    
 
 
-public function showEtapes(Chantier $chantier): ChantierPostesEtapesOutput
+public function showSuivi(Chantier $chantier): ChantierSuiviOutput
 {
-    $dto = new ChantierPostesEtapesOutput();
-    $dto->id = (int) $chantier->getId();
-    $dto->nomClient = $chantier->getClient()?->getNom();
-    $dto->ville = $chantier->getVille();
+    $dto = new ChantierSuiviOutput();
+    $dto->header = $this->headerBuilder->build($chantier);
 
     $index = $this->indexChantierEtapesByEtapeId($chantier);
 
@@ -219,6 +217,7 @@ public function showEtapes(Chantier $chantier): ChantierPostesEtapesOutput
         $posteDto->id = (int) $cp->getId();
         $posteDto->libelle = $cp->getPoste()?->getLibelle();
         $posteDto->montantHT = (float) ($cp->getMontantHT() ?? 0.0);
+        $posteDto->montantTTC = (float) ($cp->getMontantTTC() ?? 0.0);
 
         foreach ($cp->getPoste()->getEtapes() as $etape) {
             $chantierEtape = $index[$etape->getId()] ?? null;

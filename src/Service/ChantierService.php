@@ -156,15 +156,16 @@ class ChantierService
     private function mapToListItem(Chantier $chantier): ChantierListItemOutput
     {
         $dto = new ChantierListItemOutput();
-        $dto->id = (int) $chantier->getId();
-        $dto->ville = $chantier->getVille();
+        $dto->header = $this->headerBuilder->build($chantier);
+        //$dto->id = (int) $chantier->getId();
+        //$dto->ville = $chantier->getVille();
         $dto->dateDemarrage = $chantier->getDateDemarrage();
         $dto->dateReception = $chantier->getDateReception();
 
-        $client = $chantier->getClient();
-        $dto->nomClient = $client ? ($client->getNom() ?? $client->getRaisonSociale() ?? null) : null; 
+        //$client = $chantier->getClient();
+        //$dto->nomClient = $client ? ($client->getNom() ?? $client->getRaisonSociale() ?? null) : null; 
         //$dto->totalHT = $this->calculTotalHt($chantier);
-        $dto->totalHT = $this->calculator->getTotalHT($chantier);
+        //$dto->totalHT = $this->calculator->getTotalHT($chantier);
 
         return $dto;
     }

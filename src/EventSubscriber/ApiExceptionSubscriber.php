@@ -23,7 +23,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $path = $request->getPathInfo();
 
-        // ✅ On ne standardise en JSON que pour ton API
+        // ATTENTION AU NOM DU PREFIXE 
         if (!str_starts_with($path, '/api2')) {
             return;
         }
@@ -36,7 +36,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
         $message = 'Une erreur interne est survenue';
         $details = null;
 
-        // 1) Exceptions métier (les tiennes)
+        // 1) Exceptions métier à préciser
         if ($e instanceof ApiException) {
             $status = $e->getStatus();
             $code = $e->getCode();

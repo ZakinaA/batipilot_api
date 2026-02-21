@@ -22,15 +22,21 @@ use App\Service\Chantier\Domain\ChantierEtatManager;
 use App\Service\Chantier\Domain\ChantierFinanceCalculator;
 use App\Service\Chantier\Query\ChantierHeaderBuilder;
 use App\Service\Chantier\Query\ChantierListQuery;
+use App\Service\Chantier\Query\ChantierOverviewQuery;
+use App\Service\Chantier\Query\ChantierKpiQuery;
+use App\Service\Chantier\Query\ChantierSuiviQuery;
 
 class ChantierService
 {
     public function __construct(
-        private ChantierRepository $chantierRepository,
-        private ChantierEtatManager $etatManager,
-        private ChantierFinanceCalculator $calculator,
-        private ChantierHeaderBuilder $headerBuilder,
-        private ChantierListQuery $listQuery
+        //private ChantierRepository $chantierRepository,
+        //private ChantierEtatManager $etatManager,
+        //private ChantierFinanceCalculator $calculator,
+        //private ChantierHeaderBuilder $headerBuilder,
+        private ChantierListQuery $listQuery,
+        private ChantierOverviewQuery $overviewQuery,
+        private ChantierKpiQuery $kpiQuery,
+        private ChantierSuiviQuery $suiviQuery
     ) {}
 
     /* Liste les chantiers démarrés, à venir et terminés
@@ -62,7 +68,8 @@ class ChantierService
      */
     public function showOverview(Chantier $chantier): ChantierOverviewOutput
     {
-
+        return $this->overviewQuery->overview($chantier);
+         /*
         $dto = new ChantierOverviewOutput();
 
         $dto->header = $this->headerBuilder->build($chantier);
@@ -91,7 +98,7 @@ class ChantierService
             $clientDto->mail = $chantier->getClient()->getMail();
             $dto->client = $clientDto;
         }
-        return $dto ;
+        return $dto ;*/
     }
 
 
@@ -99,17 +106,19 @@ class ChantierService
      * Retourne les informations financières du chantier
      */
     public function showKpi(Chantier $chantier): ChantierKpiOutput
-    {
+    {   
+        return $this->kpiQuery->kpi($chantier);
+        /*
  
         $dto = new ChantierKpiOutput();
         $dto->header = $this->headerBuilder->build($chantier);
         //$dto->id = $chantier->getId();
         //$dto->nomClient = $chantier->getClient()->getNom();
         //$dto->ville = $chantier->getVille();
-        /* Équipe : juste le nom
+        // Équipe : juste le nom
         if ($chantier->getEquipe()) {
             $dto->equipe = $chantier->getEquipe()->getNom();
-        } */  
+        } //  
 
         foreach ($chantier->getChantierPostes() as $cp) {
             $posteDto = new ChantierPosteKpiOutput();
@@ -151,7 +160,7 @@ class ChantierService
         //calcul de la marge
         $dto->tauxMarge = $this->safePercent($dto->totalHT - $dto->totalCout,$dto->totalCout);
     
-        return $dto ;
+        return $dto ;*/
     }
 
    
@@ -174,7 +183,7 @@ class ChantierService
         return $dto;
     }*/
 
-    private function calculTotalHt(Chantier $chantier): float
+    /*private function calculTotalHt(Chantier $chantier): float
     {
         $total = 0.0;
         foreach ($chantier->getChantierPostes() as $chantierPoste) {
@@ -182,11 +191,11 @@ class ChantierService
         }
         // arrondi 
         return round($total, 2);
-    }
+    }*/
 
     // 1 journée = 7h = 420 min
     // coutTrajetChantier = nbTrajets * 420/ coefficient
-    private function calculCoutTrajet(int $nbTrajets, float $tempsTrajet, float $coefficient): float
+    /*private function calculCoutTrajet(int $nbTrajets, float $tempsTrajet, float $coefficient): float
     {
         if ($nbTrajets <= 0 || $tempsTrajet <= 0.0 || $coefficient <= 0.0) {
             return 0.0;
@@ -204,12 +213,15 @@ class ChantierService
             return 0.0;
         }
         return round(($numerator / $denominator) * 100, 2);
-    }
+    }*/
    
 
 
 public function showSuivi(Chantier $chantier): ChantierSuiviOutput
 {
+    
+    return $this->suiviQuery->suivi($chantier);
+    /*
     $dto = new ChantierSuiviOutput();
     $dto->header = $this->headerBuilder->build($chantier);
 
@@ -234,24 +246,25 @@ public function showSuivi(Chantier $chantier): ChantierSuiviOutput
     }
 
     return $dto;
+    */
 }
 
-/** @return array<int, ChantierEtape> */
+/* @return array<int, ChantierEtape> */
 private function indexChantierEtapesByEtapeId(Chantier $chantier): array
 {
-    $index = [];
+    /*$index = [];
     foreach ($chantier->getChantierEtapes() as $ce) {
         $etapeId = $ce->getEtape()?->getId();
         if ($etapeId !== null) {
             $index[(int) $etapeId] = $ce;
         }
     }
-    return $index;
+    return $index;*/
 }
 
 private function mapEtapeDisplayValue(Etape $etape, ChantierEtape $chantierEtape): EtapeValueOutput
 {
-    $dto = new EtapeValueOutput();
+    /*$dto = new EtapeValueOutput();
     $dto->id = (int) $etape->getId();
     $dto->libelle = $etape->getLibelle();
 
@@ -315,7 +328,7 @@ private function mapEtapeDisplayValue(Etape $etape, ChantierEtape $chantierEtape
             break;
     }
 
-    return $dto;
+    return $dto;*/
 }
 
 }

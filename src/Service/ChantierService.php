@@ -21,6 +21,7 @@ use App\Entity\Etape;
 use App\Service\Chantier\Domain\ChantierEtatManager;
 use App\Service\Chantier\Domain\ChantierFinanceCalculator;
 use App\Service\Chantier\Query\ChantierHeaderBuilder;
+use App\Service\Chantier\Query\ChantierListQuery;
 
 class ChantierService
 {
@@ -28,7 +29,8 @@ class ChantierService
         private ChantierRepository $chantierRepository,
         private ChantierEtatManager $etatManager,
         private ChantierFinanceCalculator $calculator,
-        private ChantierHeaderBuilder $headerBuilder
+        private ChantierHeaderBuilder $headerBuilder,
+        private ChantierListQuery $listQuery
     ) {}
 
     /* Liste les chantiers démarrés, à venir et terminés
@@ -36,7 +38,8 @@ class ChantierService
      */
     public function list(): ChantierListParEtatOutput
     {
-        //$chantiers = $this->chantierRepository->findAll();
+         return $this->listQuery->listParEtat();
+        /*$chantiers = $this->chantierRepository->findAll();
         $chantiers = $this->chantierRepository->findAvecClientEtPostes();
 
         $list_out = new ChantierListParEtatOutput();
@@ -52,7 +55,7 @@ class ChantierService
                 default => $list_out->aVenir[] = $chantierOut,
             };
         }
-        return $list_out;
+        return $list_out;*/
     }
      /**
      * Retourne les informations générales du chantier + totalHT
@@ -153,7 +156,7 @@ class ChantierService
 
    
 
-    // Mappe un chantier en Dto Chantier plus simple utilisé dans la liste des chantiers
+    /* Mappe un chantier en Dto Chantier plus simple utilisé dans la liste des chantiers
     private function mapToListItem(Chantier $chantier): ChantierListItemOutput
     {
         $dto = new ChantierListItemOutput();
@@ -169,7 +172,7 @@ class ChantierService
         //$dto->totalHT = $this->calculator->getTotalHT($chantier);
 
         return $dto;
-    }
+    }*/
 
     private function calculTotalHt(Chantier $chantier): float
     {

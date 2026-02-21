@@ -6,6 +6,7 @@ use App\Dto\Chantier\Commun\ChantierHeaderOutput;
 use App\Entity\Chantier;
 use App\Service\Chantier\Domain\ChantierFinanceCalculator;
 
+
 class ChantierHeaderBuilder
 {
     public function __construct(private ChantierFinanceCalculator $calculator) {}

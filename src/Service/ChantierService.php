@@ -2,10 +2,10 @@
 
 namespace App\Service;
 
-use App\Dto\Chantier\ChantierKpiOutput;
-use App\Dto\Chantier\ChantierListParEtatOutput;
-use App\Dto\Chantier\ChantierOverviewOutput;
-use App\Dto\Chantier\ChantierSuiviOutput;
+use App\Dto\Chantier\Output\ChantierKpiOutput;
+use App\Dto\Chantier\Output\ChantierListParEtatOutput;
+use App\Dto\Chantier\Output\ChantierOverviewOutput;
+use App\Dto\Chantier\Output\ChantierSuiviOutput;
 use App\Entity\Chantier;
 use App\Service\Chantier\Query\ChantierKpiQuery;
 use App\Service\Chantier\Query\ChantierListQuery;

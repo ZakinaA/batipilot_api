@@ -2,8 +2,8 @@
 
 namespace App\Service\Chantier\Query;
 
-use App\Dto\Chantier\ChantierKpiOutput;
-use App\Dto\Chantier\ChantierPosteKpiOutput;
+use App\Dto\Chantier\Output\ChantierKpiOutput;
+use App\Dto\Chantier\Output\ChantierPosteKpiOutput;
 use App\Entity\Chantier;
 
 class ChantierKpiQuery

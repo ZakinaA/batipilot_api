@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Dto\Chantier;
+namespace App\Dto\Chantier\Output;
 
 class ChantierPostesOutput
 {

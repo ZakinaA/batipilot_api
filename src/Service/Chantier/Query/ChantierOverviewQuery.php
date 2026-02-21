@@ -2,7 +2,7 @@
 
 namespace App\Service\Chantier\Query;
 
-use App\Dto\Chantier\ChantierOverviewOutput;
+use App\Dto\Chantier\Output\ChantierOverviewOutput;
 use App\Dto\Client\ClientDetailOutput;
 use App\Entity\Chantier;
 

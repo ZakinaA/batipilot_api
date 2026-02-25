@@ -20,8 +20,8 @@ class ChantierOverviewQuery
         $dto->adresse = $chantier->getAdresse();
         $dto->copos = $chantier->getCopos();
         $dto->dateDebutPrevue = $chantier->getDateDebutPrevue();
-        $dto->dateDemarrage = $chantier->getDateDemarrage();
-        $dto->dateReception = $chantier->getDateReception();
+        //$dto->dateDemarrage = $chantier->getDateDemarrage();
+        //$dto->dateReception = $chantier->getDateReception();
         $dto->dateFin = $chantier->getDateFin();
         $dto->surfacePlancher = $chantier->getSurfacePlancher();
         $dto->surfaceHabitable = $chantier->getSurfaceHabitable();

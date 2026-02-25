@@ -15,10 +15,11 @@ class ChantierHeaderBuilder
     {
         $dto = new ChantierHeaderOutput();
         $dto->id = (int) $chantier->getId();
-        $dto->nomClient = $chantier->getClient()?->getNom() ?? $chantier->getClient()?->getRaisonSociale();
+        $dto->nomClient = $chantier->getClient()?->getNom() ?? "Client inconnu";
         $dto->ville = $chantier->getVille();
-        $dto->totalHT = $this->calculator->getTotalHT($chantier);
-        $dto->totalTTC = $this->calculator->getTotalTTC($chantier);
+        $dto->dateDemarrage = $chantier->getDateDemarrage();
+        $dto->dateReception = $chantier->getDateReception();
+        $dto->coefficient = $chantier->getCoefficient();
         $dto->equipe = $chantier->getEquipe()?->getNom();
 
         return $dto;

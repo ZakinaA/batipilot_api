@@ -4,6 +4,7 @@ namespace App\Dto\Chantier\Output;
 
 use App\Dto\Client\ClientDetailOutput;
 use App\Dto\Chantier\Commun\ChantierHeaderOutput;
+use App\Dto\Chantier\Commun;
 
 class ChantierOverviewOutput
 {
@@ -24,6 +25,8 @@ class ChantierOverviewOutput
     public ?string $alerte = null;
     //public ?string $equipe = null;
     public ?ClientDetailOutput $client = null;
+
+    public ChantierTotauxOutput $totaux;
 
     // variable de calcul
     public ?float $totalHT = null;

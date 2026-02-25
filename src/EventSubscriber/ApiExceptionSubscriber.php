@@ -24,7 +24,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
         $path = $request->getPathInfo();
 
         // ATTENTION AU NOM DU PREFIXE 
-        if (!str_starts_with($path, '/api2')) {
+        if (str_starts_with($path, '/api/v1/chantiers')) {
             return;
         }
 
@@ -49,7 +49,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 
             if ($status === 404) {
                 // ✅ Message propre : on ne renvoie PAS le message technique Symfony
-                if (str_starts_with($path, '/api2/chantiers')) {
+                if (str_starts_with($path, '/api/v1/chantiers')) {
                     $code = 'CHANTIER_NOT_FOUND';
                     $message = 'Chantier non trouvé';
                 } else {

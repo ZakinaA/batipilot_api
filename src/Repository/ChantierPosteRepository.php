@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Chantier;
 use App\Entity\ChantierPoste;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,23 @@ class ChantierPosteRepository extends ServiceEntityRepository
         parent::__construct($registry, ChantierPoste::class);
     }
 
-    //    /**
-    //     * @return ChantierPoste[] Returns an array of ChantierPoste objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+     /** @return array<int, ChantierPoste> [posteId => ChantierPoste] */
+    public function findByChantierIndexedByPoste(Chantier $chantier): array
+    {
+        $rows = $this->createQueryBuilder('cp')
+            ->leftJoin('cp.poste', 'p')->addSelect('p')
+            ->andWhere('cp.chantier = :c')->setParameter('c', $chantier)
+            ->getQuery()
+            ->getResult();
 
-    //    public function findOneBySomeField($value): ?ChantierPoste
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $out = [];
+        foreach ($rows as $cp) {
+            $posteId = $cp->getPoste()?->getId();
+            if ($posteId) {
+                $out[(int) $posteId] = $cp;
+            }
+        }
+
+        return $out;
+    }
 }

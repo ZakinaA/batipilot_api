@@ -21,11 +21,6 @@ class ChantierKpiQuery
     {
         $dto = new ChantierKpiOutput();
         $dto->header = $this->headerBuilder->build($chantier);
-
-        $dto->dateDemarrage = $chantier->getDateDemarrage();
-        $dto->dateReception = $chantier->getDateReception();
-        $dto->coefficient = $chantier->getCoefficient();
-
         $dto->totaux = $this->calculator->calculate($chantier);
         
         $coef = (float) ($chantier->getCoefficient() ?? 0.0);
@@ -50,7 +45,6 @@ class ChantierKpiQuery
             $mainOeuvre = (float) ($cp->getNbJoursTravailles() ?? 0.0) * $coef;
             $posteDto->montantMainOeuvre = round($mainOeuvre, 2);
 
-            $transport = $this->calculCoutTrajet($nbTrajets, $tempsTrajet, $coef);
 
             $coutPoste = (float) $posteDto->montantFournitures
                 + (float) $posteDto->montantPrestataire
@@ -66,15 +60,6 @@ class ChantierKpiQuery
         }
 
         return $dto;
-    }
-
-    private function calculCoutTrajet(int $nbTrajets, float $tempsTrajet, float $coefficient): float
-    {
-        if ($nbTrajets <= 0 || $tempsTrajet <= 0.0 || $coefficient <= 0.0) {
-            return 0.0;
-        }
-        $coutParMinute = $coefficient / 420;
-        return round($nbTrajets * $tempsTrajet * $coutParMinute, 2);
     }
 
 }

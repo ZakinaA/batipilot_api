@@ -2,7 +2,7 @@
 
 namespace App\Service\Chantier\Query;
 
-use App\Dto\Chantier\Output\ChantierOverviewOutput;
+use App\Dto\Chantier\Output\Overview\ChantierOverviewOutput;
 use App\Dto\Client\ClientDetailOutput;
 use App\Entity\Chantier;
 
@@ -16,6 +16,7 @@ class ChantierOverviewQuery
     {
         $dto = new ChantierOverviewOutput();
         $dto->header = $this->headerBuilder->build($chantier);
+        
 
         $dto->adresse = $chantier->getAdresse();
         $dto->copos = $chantier->getCopos();

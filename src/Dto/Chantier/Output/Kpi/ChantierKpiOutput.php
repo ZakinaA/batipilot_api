@@ -1,5 +1,5 @@
 <?php
-namespace App\Dto\Chantier\Output;
+namespace App\Dto\Chantier\Output\Kpi;
 
 use App\Dto\Chantier\ChantierPosteKpiOutput;
 use App\Dto\Chantier\Commun\ChantierHeaderOutput;

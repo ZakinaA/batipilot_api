@@ -1,7 +1,7 @@
 <?php
 namespace App\Dto\Chantier\Output\Kpi;
 
-class ChantierPosteKpiOutput
+class ChantierKpiPosteOutput
 {
     public int $id;
     public string $libelle;

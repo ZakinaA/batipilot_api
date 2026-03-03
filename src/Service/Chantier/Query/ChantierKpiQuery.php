@@ -2,8 +2,8 @@
 
 namespace App\Service\Chantier\Query;
 
-use App\Dto\Chantier\Output\ChantierKpiOutput;
-use App\Dto\Chantier\Output\ChantierPosteKpiOutput;
+use App\Dto\Chantier\Output\Kpi\ChantierKpiOutput;
+use App\Dto\Chantier\Output\Kpi\ChantierKpiPosteOutput;
 use App\Entity\Chantier;
 use App\Service\Chantier\Domain\ChantierFinanceCalculator;
 use App\Service\Chantier\Query\ChantierHeaderBuilder;
@@ -34,7 +34,7 @@ class ChantierKpiQuery
         foreach ($chantier->getChantierPostes() as $cp) {
             $p = $cp->getPoste();
 
-            $posteDto = new ChantierPosteKpiOutput();
+            $posteDto = new ChantierKpiPosteOutput();
             $posteDto->id = (int) ($p?->getId() ?? 0);
             $posteDto->libelle = (string) ($p?->getLibelle() ?? '');
 

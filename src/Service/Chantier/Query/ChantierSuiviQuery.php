@@ -2,8 +2,8 @@
 
 namespace App\Service\Chantier\Query;
 
-use App\Dto\Chantier\Output\ChantierSuiviOutput;
-use App\Dto\Chantier\Output\ChantierPosteEtapesOutput;
+use App\Dto\Chantier\Output\Suivi\ChantierSuiviOutput;
+use App\Dto\Chantier\Output\Suivi\ChantierPosteEtapesOutput;
 use App\Dto\Etape\EtapeValueOutput;
 use App\Entity\Chantier;
 use App\Entity\ChantierEtape;

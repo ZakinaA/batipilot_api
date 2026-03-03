@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Dto\Chantier\Output;
+namespace App\Dto\Chantier\Output\Overview;
 
 use App\Dto\Client\ClientDetailOutput;
 use App\Dto\Chantier\Commun\ChantierHeaderOutput;

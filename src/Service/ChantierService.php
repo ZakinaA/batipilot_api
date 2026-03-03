@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Dto\Chantier\Output\ChantierKpiOutput;
-use App\Dto\Chantier\Output\ChantierListParEtatOutput;
+use App\Dto\Chantier\Output\List\ChantierListParEtatOutput;
 use App\Dto\Chantier\Output\ChantierOverviewOutput;
 use App\Dto\Chantier\Output\ChantierSuiviOutput;
 use App\Entity\Chantier;

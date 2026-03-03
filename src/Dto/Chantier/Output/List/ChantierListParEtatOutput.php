@@ -1,5 +1,5 @@
 <?php
-namespace App\Dto\Chantier\Output;
+namespace App\Dto\Chantier\Output\List;
 
 class ChantierListParEtatOutput
 {

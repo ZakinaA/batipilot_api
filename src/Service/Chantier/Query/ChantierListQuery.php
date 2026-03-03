@@ -2,8 +2,8 @@
 
 namespace App\Service\Chantier\Query;
 
-use App\Dto\Chantier\Output\ChantierListParEtatOutput;
-use App\Dto\Chantier\Output\ChantierListItemOutput;
+use App\Dto\Chantier\Output\List\ChantierListParEtatOutput;
+use App\Dto\Chantier\Output\List\ChantierListItemOutput;
 use App\Entity\Chantier;
 use App\Repository\ChantierRepository;
 use App\Service\Chantier\Domain\ChantierEtatManager;

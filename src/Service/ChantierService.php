@@ -31,7 +31,7 @@ class ChantierService
 
 
      /**
-     * Retourne les informations générales du chantier + totalHT
+     * Retourne les informations générales du chantier
      */
     public function showOverview(Chantier $chantier): ChantierOverviewOutput
     {

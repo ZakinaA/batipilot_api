@@ -45,16 +45,7 @@ class ChantierListQuery
     {
         $dto = new ChantierListItemOutput();
         $dto->header = $this->headerBuilder->build($chantier);
-        //$dto->id = (int) $chantier->getId();
-        //$dto->ville = $chantier->getVille();
-        $dto->dateDemarrage = $chantier->getDateDemarrage();
-        $dto->dateReception = $chantier->getDateReception();
-
-        //$client = $chantier->getClient();
-        //$dto->nomClient = $client ? ($client->getNom() ?? $client->getRaisonSociale() ?? null) : null; 
-        //$dto->totalHT = $this->calculTotalHt($chantier);
-        //$dto->totalHT = $this->calculator->getTotalHT($chantier);
-
+        $dto->totaux = $this->calculator->calculate($chantier);
         return $dto;
     }
 }

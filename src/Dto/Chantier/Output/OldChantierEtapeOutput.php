@@ -1,7 +1,7 @@
 <?php
 namespace App\Dto\Chantier\Output\Suivi;
 
-class ChantierEtapeOutput
+class OldChantierEtapeOutput
 {
     public int $id;
     public string $libelle;

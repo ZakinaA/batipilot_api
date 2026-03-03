@@ -4,6 +4,7 @@ namespace App\Dto\Chantier\Output\Overview;
 
 use App\Dto\Client\ClientDetailOutput;
 use App\Dto\Chantier\Commun\ChantierHeaderOutput;
+use App\Dto\Chantier\Commun\ChantierTotauxOutput;
 use App\Dto\Chantier\Commun;
 
 class ChantierOverviewOutput

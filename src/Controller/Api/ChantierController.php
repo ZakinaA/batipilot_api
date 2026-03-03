@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Chantier;
+use App\Repository\ChantierRepository;
 use App\Service\ChantierService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -57,10 +58,19 @@ class ChantierController extends AbstractController
     }
 
     #[Route('/{id<\d+>}/kpi', name: 'kpi', methods: ['GET'])]
-    public function kpi(Chantier $chantier): JsonResponse
+    public function kpi(int $id, ChantierRepository $repo): JsonResponse
     {
-        return $this->json($this->chantierService->showKpi($chantier));
+        $chantier = $repo->findOnePourKpi($id);
+        if (!$chantier) {
+            throw new NotFoundHttpException();
+        }
+
+         return $this->json($this->chantierService->showKpi($chantier));
+        
     }
+
+    
+
 
     #[Route('/{id<\d+>}/suivi', name: 'suivi', methods: ['GET'])]
     public function suivi(Chantier $chantier): JsonResponse

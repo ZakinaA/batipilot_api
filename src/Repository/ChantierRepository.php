@@ -25,4 +25,17 @@ class ChantierRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    // requête optimisée pour le KPI chantier, avec tous les éléments nécessaires en une seule requête
+    public function findOnePourKpi(int $id): ?Chantier
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.client', 'cl')->addSelect('cl')
+            ->leftJoin('c.equipe', 'eq')->addSelect('eq')
+            ->leftJoin('c.chantierPostes', 'cp')->addSelect('cp')
+            ->leftJoin('cp.poste', 'p')->addSelect('p')
+            ->andWhere('c.id = :id')->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 }

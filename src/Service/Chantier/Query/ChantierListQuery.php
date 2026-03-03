@@ -28,6 +28,7 @@ class ChantierListQuery
         foreach ($chantiers as $chantier) {
             $item = $this->mapToListItem($chantier);
             $etat = $this->etatManager->getEtat($chantier);
+            
 
             match ($etat) {
                 'demarre' => $out->demarres[] = $item,

@@ -15,6 +15,5 @@ class ChantierPosteKpiOutput
     public ?float $montantCoutPoste= null;
     public ?float $margePoste = null;
     public ?float $tauxMargePoste = null;
-    /* @var EtapeOutput[] */
-   //public array $etapes = [];
+
 }

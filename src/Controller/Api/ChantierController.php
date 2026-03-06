@@ -8,7 +8,7 @@ use App\Service\ChantierService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Dto\Chantier\Input\CreateChantierInput;
+use App\Dto\Chantier\Input\CreateChantierOverviewInput;
 use App\Dto\Chantier\Input\UpsertChantierPostesInput;
 use App\Dto\Chantier\Input\UpsertChantierEtapesInput;
 use App\Exception\ApiValidationException;
@@ -39,7 +39,7 @@ class ChantierController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         /** @var CreateChantierInput $in */
-        $in = $this->serializer->deserialize($request->getContent(), CreateChantierInput::class, 'json');
+        $in = $this->serializer->deserialize($request->getContent(), CreateChantierOverviewInput::class, 'json');
 
         $violations = $this->validator->validate($in);
         if (count($violations) > 0) {

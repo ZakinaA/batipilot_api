@@ -1,5 +1,5 @@
 <?php
-namespace App\Dto\Chantier\Output\Suivi;
+namespace App\Dto\Chantier\Output;
 
 class OldChantierEtapeOutput
 {

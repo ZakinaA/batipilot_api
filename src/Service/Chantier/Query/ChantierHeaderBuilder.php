@@ -20,6 +20,7 @@ class ChantierHeaderBuilder
         $dto->dateDemarrage = $chantier->getDateDemarrage();
         $dto->dateReception = $chantier->getDateReception();
         $dto->coefficient = $chantier->getCoefficient();
+        $dto->idEquipe = $chantier->getEquipe()?->getId();
         $dto->nomEquipe = $chantier->getEquipe()?->getNom();
 
         return $dto;

@@ -10,5 +10,6 @@ class ChantierHeaderOutput
     public ?\DateTime $dateDemarrage = null;
     public ?\DateTime $dateReception = null;
     public ?float $coefficient = null;
+    public ?string $idEquipe = null;
     public ?string $nomEquipe = null;
 }

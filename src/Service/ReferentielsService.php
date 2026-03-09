@@ -50,4 +50,31 @@ class ReferentielsService
             'etapes' => $etapes,
         ];
     }
+
+    public function getPostesAvecEtapes(): array
+    {
+        $postes = $this->posteRepo->findBy(['archive' => 0], ['ordre' => 'ASC']);
+
+        return array_map(function ($poste) {
+            $etapes = array_map(fn($etape) => [
+                'id' => $etape->getId(),
+                'libelle' => $etape->getLibelle(),
+                'format' => $etape->getEtapeFormat()?->getLibelle(),
+                'etapeFormatId' => $etape->getEtapeFormat()?->getId(),
+                'archive' => $etape->getArchive(),
+            ], array_filter(
+                $poste->getEtapes()->toArray(),
+                fn($etape) => $etape->getArchive() === 0
+            ));
+
+            return [
+                'id' => $poste->getId(),
+                'libelle' => $poste->getLibelle(),
+                'tva' => $poste->getTva(),
+                'ordre' => $poste->getOrdre(),
+                'archive' => $poste->getArchive(),
+                'etapes' => array_values($etapes),
+            ];
+        }, $postes);
+    }
 }

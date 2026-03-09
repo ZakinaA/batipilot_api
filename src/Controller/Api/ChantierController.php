@@ -36,7 +36,7 @@ class ChantierController extends AbstractController
     }
 
     #[Route('', name: 'create', methods: ['POST'])]
-    public function create(Request $request): JsonResponse
+    public function createOverview(Request $request): JsonResponse
     {
         /** @var CreateChantierInput $in */
         $in = $this->serializer->deserialize($request->getContent(), CreateChantierOverviewInput::class, 'json');
@@ -46,9 +46,30 @@ class ChantierController extends AbstractController
             throw ApiValidationException::fromErrors($this->errorMapper->map($violations));
         }
 
-        $id = $this->chantierWriteService->createChantier($in);
+        //$id = $this->chantierWriteService->createChantier($in);
+        $id = $this->chantierWriteService->createOverview($in);
 
         return $this->json(['id' => $id], 201);
+    }
+
+    #[Route('/{id<\d+>}/overview', name: 'update_overview', methods: ['PUT'])]
+    public function updateOverview(Chantier $chantier, Request $request): JsonResponse
+    {
+        /** @var CreateChantierOverviewInput $in */
+        $in = $this->serializer->deserialize(
+            $request->getContent(),
+            CreateChantierOverviewInput::class,
+            'json'
+        );
+
+        $violations = $this->validator->validate($in);
+        if (count($violations) > 0) {
+            throw ApiValidationException::fromErrors($this->errorMapper->map($violations));
+        }
+
+        $this->chantierWriteService->updateOverview($chantier, $in);
+
+        return $this->json(null, 204);
     }
 
     #[Route('/{id<\d+>}/overview', name: 'overview', methods: ['GET'])]

@@ -6,6 +6,7 @@ use App\Dto\Chantier\Input\CreateChantierOverviewInput;
 use App\Dto\Chantier\Input\UpsertChantierPostesInput;
 use App\Dto\Chantier\Input\UpsertChantierEtapesInput;
 use App\Entity\Chantier;
+use App\Entity\Client;
 use App\Entity\ChantierPoste;
 use App\Entity\ChantierEtape;
 use App\Exception\ApiException;
@@ -27,7 +28,26 @@ class ChantierWriteService
         private ChantierEtapeRepository $chantierEtapeRepo,
     ) {}
 
-    public function createChantier(CreateChantierOverviewInput $in): int
+    public function createOverview(CreateChantierOverviewInput $in): int
+    {
+        $chantier = new Chantier();
+        $chantier->setArchive(0);
+
+        $this->applyOverviewData($chantier, $in);
+
+        $this->em->persist($chantier);
+        $this->em->flush();
+
+        return (int) $chantier->getId();
+    }
+
+    public function updateOverview(Chantier $chantier, CreateChantierOverviewInput $in): void
+    {
+        $this->applyOverviewData($chantier, $in);
+        $this->em->flush();
+    }
+
+    private function applyOverviewData(Chantier $chantier, CreateChantierOverviewInput $in): void
     {
         if (!$in->client || !$in->chantier) {
             throw new ApiException('Payload invalide', 'INVALID_PAYLOAD', 400);
@@ -38,39 +58,36 @@ class ChantierWriteService
             throw new ApiException('Équipe introuvable', 'EQUIPE_NOT_FOUND', 404);
         }
 
-        $client = new \App\Entity\Client();
+        $client = $chantier->getClient();
+        if (!$client) {
+            $client = new Client();
+            $chantier->setClient($client);
+            $this->em->persist($client);
+        }
+
         $client->setNom(trim((string) $in->client->nom));
         $client->setPrenom($in->client->prenom ? trim($in->client->prenom) : null);
         $client->setTelephone($in->client->telephone ? trim($in->client->telephone) : null);
         $client->setMail($in->client->mail ? trim($in->client->mail) : null);
 
-        $chantier = new Chantier();
-        $chantier->setClient($client);
         $chantier->setEquipe($equipe);
-
         $chantier->setAdresse($in->chantier->adresse);
         $chantier->setCopos($in->chantier->copos);
         $chantier->setVille($in->chantier->ville);
-
         $chantier->setDateDemarrage(new \DateTime($in->chantier->dateDemarrage));
-        $chantier->setDateReception($in->chantier->dateReception ? new \DateTime($in->chantier->dateReception) : null);
-        //$chantier->setDateFin($in->chantier->dateFin ? new \DateTime($in->chantier->dateFin) : null);
-
+        $chantier->setDateReception(
+            $in->chantier->dateReception ? new \DateTimeImmutable($in->chantier->dateReception) : null
+        );
         $chantier->setSurfacePlancher($in->chantier->surfacePlancher);
         $chantier->setSurfaceHabitable($in->chantier->surfaceHabitable);
         $chantier->setDistanceDepot($in->chantier->distanceDepot);
         $chantier->setTempsTrajet($in->chantier->tempsTrajet);
         $chantier->setCoefficient($in->chantier->coefficient);
         $chantier->setAlerte($in->chantier->alerte);
-
-        $chantier->setArchive(0);
-
-        $this->em->persist($client);
-        $this->em->persist($chantier);
-        $this->em->flush();
-
-        return (int) $chantier->getId();
     }
+
+
+
 
     public function upsertPostes(Chantier $chantier, UpsertChantierPostesInput $in): int
     {

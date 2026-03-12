@@ -6,7 +6,6 @@ use App\Repository\ClientRepository;
 use App\Repository\EquipeRepository;
 use App\Repository\PosteRepository;
 use App\Repository\EtapeRepository;
-use App\Repository\EtapeFormatRepository;
 
 class ReferentielsService
 {
@@ -15,16 +14,15 @@ class ReferentielsService
         private EquipeRepository $equipeRepo,
         private PosteRepository $posteRepo,
         private EtapeRepository $etapeRepo,
-        private EtapeFormatRepository $etapeFormatRepo,
     ) {}
 
     public function getAll(): array
     {
-        /*$clients = array_map(fn($c) => [
+        $clients = array_map(fn($c) => [
             'id' => $c->getId(),
             'nom' => $c->getNom(),
             'prenom' => $c->getPrenom(),
-        ], $this->clientRepo->findAll());*/
+        ], $this->clientRepo->findAll());
 
         $equipes = array_map(fn($e) => [
             'id' => $e->getId(),
@@ -45,17 +43,11 @@ class ReferentielsService
             'format' => $e->getEtapeFormat()?->getLibelle(), // "date", "datetime", "text"...
         ], $this->etapeRepo->findBy(['archive' => 0]));
 
-        $etape_formats = array_map(fn($e) => [
-            'id' => $e->getId(),
-            'libelle' => $e->getLibelle(),
-        ], $this->etapeFormatRepo->findAll());
-
         return [
-            //'clients' => $clients,
+            'clients' => $clients,
             'equipes' => $equipes,
             'postes' => $postes,
             'etapes' => $etapes,
-            'etape_formats' => $etape_formats,
         ];
     }
 
